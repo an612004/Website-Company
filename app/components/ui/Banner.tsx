@@ -55,7 +55,7 @@ export default function Banner() {
                         <a href="#" className="text-blue-600 font-semibold underline ml-2">Tại Đây!</a>
                     </div>
                     <h1 className="text-3xl md:text-5xl font-extrabold text-purple-800 text-center mb-2 drop-shadow-lg">
-                        Phần Mềm Hiện Đại<br />
+                        Sản Phẩm Hiện Đại<br />
                         <span className="text-orange-500 transition-all duration-500 animate-fadeIn" style={{ minHeight: 56 }}>
                             Ứng Dụng Trong {typed}
                             <span className="animate-blink">|</span>

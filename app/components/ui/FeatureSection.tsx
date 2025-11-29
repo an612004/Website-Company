@@ -1,13 +1,14 @@
 "use client";
 import React from "react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
+import { Code, Settings, HardDrive, Zap, CheckCircle } from 'lucide-react'; // 💡 Import Lucide Icons
 
 // 1. ĐỊNH NGHĨA INTERFACE CHO TAB
 interface ITab {
     id: number;
     title: string;
-    icon: React.ReactNode; // Updated to use React.ReactNode for icon property
+    icon: React.ReactNode;
     headline: string;
     content: string[];
     ctaText: string;
@@ -24,103 +25,66 @@ const tabsData: ITab[] = [
     {
         id: 1,
         title: "Thiết kế Website",
-        icon: (
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.764 1.764 0 01-3.21 1.055L6 17H4a2 2 0 01-2-2v-4a2 2 0 012-2h2L8 6.64a1.764 1.764 0 013.21-1.058zM15 11l4-4m0 0l-4-4m4 4l-4 4"></path>
-            </svg>
-        ),
+        icon: <Code size={24} />, // 💡 Thay thế SVG bằng Lucide Icon
         headline: "Thiết Kế Website Chuyên Nghiệp - Tối Ưu Hiệu Quả Kinh Doanh",
         content: [
             "Thiết kế website chuẩn SEO, giao diện hiện đại, thân thiện người dùng.",
             "Phân tích hành vi người dùng – nguồn lưu lượng.",
             "Tối ưu trải nghiệm người dùng để tăng tỷ lệ chuyển đổi.",
-            "..."
-
+            "Bảo trì và hỗ trợ kỹ thuật 24/7." // Thêm 1 mục để danh sách đồng đều hơn
         ],
         ctaText: "Tham khảo dịch vụ thiết kế web",
         ctaLink: "/design-services",
         imageSrc: { phone: "/logo.png", tablet: "/logo.png" },
-        imageAlt: "Dashboard báo cáo analytics trên thiết bị"
+        imageAlt: "Giao diện website responsive trên điện thoại và máy tính bảng"
     },
     {
-
         id: 2,
         title: "Tool Phần Mềm",
-        icon: (
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1l-.75-3M3 8h18M5.25 10h13.5l-1 5H6.25l-1-5zM9 4l1.5-1h3L15 4M7 4h10"></path>
-            </svg>
-        ),
+        icon: <Settings size={24} />, // 💡 Thay thế SVG bằng Lucide Icon
         headline: "Tool Phần Mềm Hỗ Trợ Thiết Kế & Phát Triển Nhanh Chóng",
         content: [
-            "Tool dò mật khẩu WiFi Hiệu quả - An toàn - bảo mật.",
-            "Tool dịch phim ảnh và video phụ đề chính xác.",
-            "Tool tạo mã QR nhanh chóng và tiện lợi.",
-            "...."
+            "Tool dò mật khẩu WiFi hiệu quả, an toàn, bảo mật.",
+            "Tool dịch phim ảnh và video phụ đề chính xác, đa ngôn ngữ.",
+            "Tool tạo mã QR nhanh chóng và tiện lợi cho chiến dịch marketing.",
+            "Các công cụ AI tự động hóa quy trình làm việc."
         ],
         ctaText: "Xem ngay các Tool",
         ctaLink: "/signup",
         imageSrc: { phone: "/images/mockup/phone-design.png", tablet: "/images/mockup/tablet-design.png" },
-        imageAlt: "Giao diện trên thiết bị di động và tablet"
+        imageAlt: "Giao diện ứng dụng phần mềm trên thiết bị di động"
     },
     {
         id: 3,
         title: "Tool Phần Cứng",
-        icon: (
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-            </svg>
-        ),
-        headline: "Tool Phần cứng chính hãng - hiệu năng cao",
+        icon: <HardDrive size={24} />, // 💡 Thay thế SVG bằng Lucide Icon
+        headline: "Tool Phần cứng chính hãng - Hiệu năng cao cho công việc và giải trí",
         content: [
-            "CPU , Mainboard , RAM , Ổ cứng ( HDD , SSD SATA , SSD NVMe) , GPU (Card đồ họa)... .",
-            "Thiết bị ngoại vi : Màn hình (60Hz, 75Hz, 144Hz, 240Hz...) , Bàn phím (Cơ / membrane) , Chuột (Wireless / có dây) , Tai nghe / Loa.",
-            "..."
+            "Linh kiện máy tính: CPU, Mainboard, RAM, Ổ cứng (SSD NVMe) và GPU (Card đồ họa) mạnh mẽ.",
+            "Thiết bị ngoại vi: Màn hình tần số quét cao (144Hz, 240Hz), Bàn phím cơ/membrane, Chuột gaming.",
+            "Hỗ trợ xây dựng cấu hình PC theo nhu cầu ngân sách cá nhân.",
+            "Bảo hành chính hãng, lắp đặt tận nơi."
         ],
         ctaText: "Xem ngay sản phẩm",
         ctaLink: "/speed-test",
         imageSrc: { phone: "/images/mockup/phone-speed.png", tablet: "/images/mockup/tablet-speed.png" },
-        imageAlt: "Biểu đồ tốc độ tải trang trên thiết bị"
+        imageAlt: "Thiết bị phần cứng máy tính và phụ kiện"
     },
-    // {
-    //     id: 3,
-    //     title: "Thiết kế Website",
-    //     icon: (
-    //         <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    //             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5.882V19.24a1.764 1.764 0 01-3.21 1.055L6 17H4a2 2 0 01-2-2v-4a2 2 0 012-2h2L8 6.64a1.764 1.764 0 013.21-1.058zM15 11l4-4m0 0l-4-4m4 4l-4 4"></path>
-    //         </svg>
-    //     ),
-    //     headline: "Thiết Kế Website Chuyên Nghiệp - Tối Ưu Hiệu Quả Kinh Doanh",
-    //     content: [
-    //         "Thiết kế website chuẩn SEO, giao diện hiện đại, thân thiện người dùng.",
-    //         "Phân tích hành vi người dùng – nguồn lưu lượng.",
-    //         "Tối ưu trải nghiệm người dùng để tăng tỷ lệ chuyển đổi.",
-    //         "..."
-
-    //     ],
-    //     ctaText: "Tham khảo dịch vụ thiết kế web",
-    //     ctaLink: "/design-services",
-    //     imageSrc: { phone: "/logo.png", tablet: "/logo.png" },
-    //     imageAlt: "Dashboard báo cáo analytics trên thiết bị"
-    // },
     {
         id: 4,
         title: "Tối ưu Marketing",
-        icon: (
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2zM15 10a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-        ),
-        headline: "Công cụ Marketing hiệu quả, tăng tỷ lệ chuyển đổi",
+        icon: <Zap size={24} />, // 💡 Thay thế SVG bằng Lucide Icon
+        headline: "Công cụ Marketing hiệu quả, tăng tỷ lệ chuyển đổi bán hàng",
         content: [
-            "Tối ưu hóa cho SEO, giúp nội dung của bạn lên top tìm kiếm.",
-            "Tích hợp các công cụ Email Marketing và Chatbot.",
-            "Quản lý các chiến dịch quảng cáo đa kênh (Google, Facebook)."
+            "Tối ưu hóa cho SEO, giúp nội dung của bạn lên top tìm kiếm Google.",
+            "Tích hợp các công cụ Email Marketing tự động hóa và Chatbot hỗ trợ khách hàng.",
+            "Quản lý và đo lường các chiến dịch quảng cáo đa kênh (Google Ads, Facebook Ads).",
+            "Tư vấn chiến lược nội dung và phân tích đối thủ cạnh tranh."
         ],
         ctaText: "Khám phá công cụ Marketing",
         ctaLink: "/marketing-tools",
         imageSrc: { phone: "/images/mockup/phone-marketing.png", tablet: "/images/mockup/tablet-marketing.png" },
-        imageAlt: "Công cụ marketing và email trên thiết bị"
+        imageAlt: "Biểu đồ marketing và công cụ quảng cáo trên thiết bị"
     }
 ];
 
@@ -131,10 +95,13 @@ const findActiveTab = (activeId: number): ITab | undefined => tabsData.find(t =>
 export default function FeatureSection() {
     const [active, setActive] = useState(1);
     const [loading, setLoading] = useState(true);
-    const currentTab = findActiveTab(active);
 
+    // Sử dụng useMemo để tránh currentTab được tính toán lại không cần thiết
+    const currentTab = useMemo(() => findActiveTab(active), [active]);
+
+    // Giữ nguyên logic loading
     React.useEffect(() => {
-        const timer = setTimeout(() => setLoading(false), 900);
+        const timer = setTimeout(() => setLoading(false), 500); // Giảm thời gian loading
         return () => clearTimeout(timer);
     }, []);
 
@@ -143,127 +110,156 @@ export default function FeatureSection() {
     }
 
     return (
-        <div className="w-full max-w-6xl mx-auto bg-gradient-to-br from-blue-50 via-teal-50 to-blue-100 rounded-3xl shadow-2xl p-6 md:p-10 my-10 relative overflow-hidden border border-blue-100">
-            {/* Loading animation overlay */}
-            {loading && (
-                <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-md animate-fadeIn">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 border-4 border-teal-400 border-t-transparent rounded-full animate-spin"></div>
-                        <span className="text-lg font-semibold text-teal-600 animate-pulse">Đang tải...</span>
-                    </div>
+        <section className="py-12 md:py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {/* TIÊU ĐỀ SECTION */}
+                <div className="text-center mb-12">
+                    <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
+                            Dịch Vụ chỉ có Tại Anbi
+                        </span>
+                    </h2>
+                    <p className="mt-4 text-xl text-gray-600">
+                        Giải pháp toàn diện từ Website, Phần mềm, Phần cứng đến Marketing.
+                    </p>
                 </div>
-            )}
-            <div className={`flex flex-col lg:flex-row gap-8 transition-all duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}>
-                {/* Cột 1: Tabs Menu */}
-                <div className="w-full lg:w-2/5 flex flex-col">
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-                        {tabsData.map((t) => (
-                            <button
-                                key={t.id}
-                                onClick={() => setActive(t.id)}
-                                className={`
-                                    flex flex-col items-center justify-center p-4 h-24 rounded-xl border-2 transition-all duration-300 transform 
-                                    ${active === t.id
-                                        ? "bg-gradient-to-br from-teal-400 to-blue-400 border-teal-400 text-white shadow-xl scale-105"
-                                        : "bg-white border-blue-100 text-blue-600 hover:bg-teal-50 hover:border-teal-200"
-                                    }
-                                `}
-                            >
-                                <div className={`${active === t.id ? "text-white" : "text-teal-600"}`}>
-                                    {t.icon}
-                                </div>
-                                <div className="mt-2 font-semibold text-center text-xs md:text-sm">{t.title}</div>
-                                {active === t.id && <div className="w-2/3 h-1 bg-gradient-to-r from-teal-400 to-blue-400 rounded-full mt-2 animate-slideIn"></div>}
-                            </button>
-                        ))}
+
+                {/* CONTAINER TABS CHÍNH */}
+                <div className="bg-white rounded-3xl shadow-2xl shadow-blue-200/50 p-4 md:p-8 relative overflow-hidden border border-gray-100">
+
+                    {/* Loading animation overlay (Sử dụng CSS hiện đại hơn) */}
+                    {loading && (
+                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm animate-fadeIn">
+                            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    )}
+
+                    {/* 💡 1. TABS MENU: Horizontal Tab Pill Style (Đẹp và Hiện đại) */}
+                    <div className="relative p-1 bg-gray-100 rounded-xl mb-10 overflow-x-auto">
+                        <div className="flex space-x-2 md:space-x-4 min-w-max">
+                            {tabsData.map((t) => (
+                                <button
+                                    key={t.id}
+                                    onClick={() => setActive(t.id)}
+                                    className={`
+                                        flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 font-semibold text-base whitespace-nowrap 
+                                        ${active === t.id
+                                            ? "bg-gradient-to-r from-teal-500 to-blue-500 text-white shadow-lg shadow-teal-500/30"
+                                            : "text-gray-700 hover:bg-white hover:text-blue-600"
+                                        }
+                                    `}
+                                >
+                                    <div className={`${active === t.id ? "" : "text-teal-600"}`}>
+                                        {t.icon}
+                                    </div>
+                                    {t.title}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                    {/* Nội dung trên Mobile/Tablet (Optional) */}
-                    <div className="lg:hidden mt-4">
+
+                    {/* 💡 2. KHU VỰC NỘI DUNG & HÌNH ẢNH */}
+                    <div className={`transition-opacity duration-700 ${loading ? 'opacity-0' : 'opacity-100'}`}>
                         <ContentDisplay currentTab={currentTab} />
                     </div>
+
                 </div>
-                {/* Cột 2: Nội dung & Hình ảnh (Desktop View) */}
-                <div className="hidden lg:flex w-full lg:w-3/5 items-center justify-between gap-8">
-                    <ContentDisplay currentTab={currentTab} />
-                </div>
+                {/* Thêm CSS cho animations */}
+                <style jsx global>{`
+                    @keyframes fadeIn {
+                        0% { opacity: 0; }
+                        100% { opacity: 1; }
+                    }
+                    .animate-fadeIn {
+                        animation: fadeIn 0.7s ease-out;
+                    }
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                    .animate-spin {
+                        animation: spin 1s linear infinite;
+                    }
+                    @keyframes mockupIn {
+                        0% { opacity: 0; transform: translateY(20px) rotate(0deg); }
+                        100% { opacity: 1; transform: translateY(0) rotate(0deg); }
+                    }
+                `}</style>
             </div>
-            {/* Animations */}
-            <style jsx>{`
-                @keyframes fadeIn {
-                    0% { opacity: 0; }
-                    100% { opacity: 1; }
-                }
-                .animate-fadeIn {
-                    animation: fadeIn 0.7s;
-                }
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                .animate-spin {
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.5; }
-                }
-                .animate-pulse {
-                    animation: pulse 1.2s infinite;
-                }
-                @keyframes slideIn {
-                    0% { width: 0; opacity: 0; }
-                    100% { width: 66%; opacity: 1; }
-                }
-                .animate-slideIn {
-                    animation: slideIn 0.7s cubic-bezier(0.4,0,0.2,1);
-                }
-            `}</style>
-        </div>
+        </section>
     );
 }
 
-// 5. COMPONENT HIỂN THỊ NỘI DUNG (Đã thêm type)
+// 5. COMPONENT HIỂN THỊ NỘI DUNG (Đã làm nổi bật và hiện đại hóa)
 const ContentDisplay = ({ currentTab }: { currentTab: ITab }) => {
     // Sử dụng key để kích hoạt animation khi chuyển tab
     return (
-        <div key={currentTab.id} className="flex flex-col md:flex-row gap-8 w-full animate-fadeIn">
-            {/* Văn bản (Chiếm 60%) */}
-            <div className="w-full md:w-3/5">
-                <h3 className="text-2xl font-extrabold text-blue-800 mb-5 border-l-4 border-teal-400 pl-3">
-                    {currentTab.headline}
+        <div
+            key={currentTab.id}
+            // 💡 Thêm min-h-toàn diện để tránh layout nhảy khi chuyển tab
+            className="flex flex-col lg:flex-row gap-12 w-full animate-fadeIn min-h-[500px] md:min-h-[400px]"
+        >
+            {/* Văn bản (Chiếm 50% trên Desktop) */}
+            <div className="w-full lg:w-1/2">
+                <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-snug">
+                    <span className="text-blue-600">{currentTab.title}:</span> {currentTab.headline}
                 </h3>
-                <div className="space-y-4 mb-8">
+                <div className="space-y-5 mb-8">
                     {currentTab.content.map((item: string, i: number) => (
-                        <div key={i} className="flex gap-3 text-gray-900 items-start">
-                            <span className="text-teal-500 text-lg font-bold">✔</span>
-                            <p className="flex-1 text-base md:text-lg font-medium">{item}</p>
+                        <div key={i} className="flex gap-4 text-gray-700 items-start">
+                            <span className="flex-shrink-0 mt-1 text-teal-500">
+                                <CheckCircle size={20} fill="currentColor" />
+                            </span>
+                            <p className="flex-1 text-lg font-medium">{item}</p>
                         </div>
-                    ))}s
+                    ))}
                 </div>
-                <a href={currentTab.ctaLink} className="inline-flex items-center mt-4 bg-gradient-to-r from-teal-500 to-blue-500 hover:from-blue-500 hover:to-teal-500 text-white px-8 py-3 rounded-full text-lg font-bold shadow-lg transition-all transform hover:scale-[1.04]">
+                <a href={currentTab.ctaLink}
+                    className="inline-flex items-center gap-2 mt-4 bg-gradient-to-r from-teal-500 to-blue-500 text-white px-8 py-3 rounded-full text-lg font-bold shadow-xl transition-all transform hover:scale-[1.04] active:scale-95 shadow-blue-500/50"
+                >
                     {currentTab.ctaText} →
                 </a>
             </div>
-            {/* Hình ảnh (Chiếm 40%) */}
-            <div className="w-full md:w-2/5 flex items-center justify-center relative min-h-[300px]">
-                <Image
-                    src={currentTab.imageSrc.phone}
-                    alt={`${currentTab.imageAlt} (Phone)`}
-                    width={150}
-                    height={300}
-                    className="absolute left-0 bottom-0 drop-shadow-2xl transition-all duration-700 opacity-100"
-                    style={{ transform: 'rotate(-5deg)', background: 'linear-gradient(135deg, #e0f7fa 0%, #e3f2fd 100%)', borderRadius: '1.5rem' }}
-                    unoptimized
-                />
+
+            {/* Hình ảnh (Mockup 3D Hiện đại - Chiếm 50% trên Desktop) */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center relative min-h-[350px]">
+                {/* Mockup 1: Tablet (Lớn hơn, phía sau) */}
                 <Image
                     src={currentTab.imageSrc.tablet}
                     alt={`${currentTab.imageAlt} (Tablet)`}
-                    width={400}
+                    width={450}
                     height={300}
-                    className="absolute right-0 bottom-0 drop-shadow-2xl transition-all duration-700 opacity-100"
-                    style={{ transform: 'rotate(5deg)', background: 'linear-gradient(135deg, #e0f7fa 0%, #e3f2fd 100%)', borderRadius: '2rem' }}
+                    className="absolute z-10 drop-shadow-2xl transition-all duration-1000 animate-mockupIn max-w-full h-auto"
+                    style={{
+                        transform: 'rotate(-5deg) translateX(10%)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+                        borderRadius: '1.5rem',
+                        animationDelay: '0.1s'
+                    }}
                     unoptimized
                 />
+
+                {/* Mockup 2: Phone (Nhỏ hơn, phía trước) */}
+                <Image
+                    src={currentTab.imageSrc.phone}
+                    alt={`${currentTab.imageAlt} (Phone)`}
+                    width={180}
+                    height={350}
+                    className="absolute z-20 drop-shadow-2xl transition-all duration-1000 animate-mockupIn max-w-full h-auto"
+                    style={{
+                        transform: 'rotate(10deg) translateX(-40%) translateY(-10%)',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+                        borderRadius: '1.5rem',
+                        animationDelay: '0.3s'
+                    }}
+                    unoptimized
+                />
+                {/* CSS cho mockupIn animation chỉ áp dụng trong phạm vi này (hoặc global) */}
+                <style jsx>{`
+                    .animate-mockupIn {
+                        animation: mockupIn 0.7s cubic-bezier(0.2, 0.8, 0.6, 1.2);
+                    }
+                `}</style>
             </div>
         </div>
     );
