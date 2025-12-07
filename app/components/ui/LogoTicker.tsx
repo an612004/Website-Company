@@ -1,21 +1,44 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
-// Danh sách các logo đối tác (thêm / chỉnh sửa ở đây)
-const logos = [
-    { src: '/logo.png', alt: 'RRed' },
-    { src: '/logos/edureka.png', alt: 'Edureka!' },
-    { src: '/logos/reliance.png', alt: 'Reliance Retail' },
-    { src: '/logos/pixis.png', alt: 'Pixis' },
-    { src: '/logos/insta-astro.png', alt: 'Insta Astro' },
-    { src: '/logos/amazon.png', alt: 'Amazon' },
-];
-
-// Nhân đôi để animation lặp mượt
-const duplicatedLogos = [...logos, ...logos];
+interface Logo {
+    _id: string;
+    url: string;
+    alt?: string;
+    link?: string;
+    order?: number;
+}
 
 export default function LogoTicker() {
+    const [logos, setLogos] = useState<Logo[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchLogos = async () => {
+            try {
+                const res = await fetch('/api/logos');
+                const data = await res.json();
+                if (data.logos) {
+                    setLogos(data.logos);
+                }
+            } catch (err) {
+                console.error('Lỗi lấy danh sách logo:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchLogos();
+    }, []);
+
+    // Nhân đôi để animation lặp mượt
+    const duplicatedLogos = [...logos, ...logos];
+
+    // Nếu không có logo nào, không hiển thị section
+    if (!loading && logos.length === 0) {
+        return null;
+    }
+
     return (
         <section className="py-12 bg-gradient-to-b from-white via-slate-50 to-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,25 +63,44 @@ export default function LogoTicker() {
                         <div className="absolute inset-y-0 right-0 w-20 pointer-events-none" style={{ background: 'linear-gradient(270deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)' }} />
 
                         <div className="py-6">
-                            <div className="overflow-hidden">
-                                <div className="logo-slide-track flex items-center whitespace-nowrap will-change-transform">
-                                    {duplicatedLogos.map((logo, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="logo-item flex-shrink-0 mx-10 md:mx-14 flex items-center justify-center transition-transform duration-300 hover:scale-105"
-                                        >
-                                            <Image
-                                                src={logo.src}
-                                                alt={logo.alt}
-                                                width={240}
-                                                height={96}
-                                                className="object-contain h-16 md:h-20"
-                                                unoptimized
-                                            />
-                                        </div>
-                                    ))}
+                            {loading ? (
+                                <div className="flex items-center justify-center h-20">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
                                 </div>
-                            </div>
+                            ) : (
+                                <div className="overflow-hidden">
+                                    <div className="logo-slide-track flex items-center whitespace-nowrap will-change-transform">
+                                        {duplicatedLogos.map((logo, idx) => (
+                                            <div
+                                                key={`${logo._id}-${idx}`}
+                                                className="logo-item flex-shrink-0 mx-10 md:mx-14 flex items-center justify-center transition-transform duration-300 hover:scale-105"
+                                            >
+                                                {logo.link ? (
+                                                    <a href={logo.link} target="_blank" rel="noopener noreferrer">
+                                                        <Image
+                                                            src={logo.url}
+                                                            alt={logo.alt || 'Logo đối tác'}
+                                                            width={240}
+                                                            height={96}
+                                                            className="object-contain h-16 md:h-20"
+                                                            unoptimized
+                                                        />
+                                                    </a>
+                                                ) : (
+                                                    <Image
+                                                        src={logo.url}
+                                                        alt={logo.alt || 'Logo đối tác'}
+                                                        width={240}
+                                                        height={96}
+                                                        className="object-contain h-16 md:h-20"
+                                                        unoptimized
+                                                    />
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

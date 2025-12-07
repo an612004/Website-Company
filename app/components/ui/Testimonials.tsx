@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-// Đã thay thế next/image bằng thẻ img tiêu chuẩn để tránh lỗi môi trường
+import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 
 // Dữ liệu mẫu cho các bình luận và đánh giá (giữ nguyên)
@@ -57,63 +56,7 @@ const testimonials = [
 ];
 
 const App = () => {
-    const carouselRef = useRef<HTMLDivElement | null>(null);
     const [isPaused, setIsPaused] = useState(false);
-
-    // Tốc độ cuộn (pixel/mili giây). Giá trị dương cuộn TỪ PHẢI QUA TRÁI.
-    const scrollSpeedRightToLeft = 0.5;
-
-    useEffect(() => {
-        const carousel = carouselRef.current;
-        if (!carousel) return;
-
-        let animationFrameId: number | null = null;
-        let startTime: number | null = null;
-        let currentScroll = 0;
-
-        // Khởi tạo cuộn ban đầu ở bên phải (bắt đầu từ giữa bộ nhân đôi) để cuộn từ phải sang trái
-        const totalWidthInit = carousel.scrollWidth;
-        let singleSetWidth = totalWidthInit / 2;
-        currentScroll = singleSetWidth;
-        carousel.scrollLeft = currentScroll;
-
-        const animateScroll = (timestamp: number) => {
-            if (!startTime) startTime = timestamp;
-            const progress = timestamp - (startTime as number);
-
-            if (!isPaused) {
-                // TÍNH TOÁN CUỘN (TỪ PHẢI QUA TRÁI)
-                // Giảm scrollLeft để nội dung dịch sang trái.
-                currentScroll -= scrollSpeedRightToLeft * (progress / 1000) * 60;
-
-                // Cập nhật vị trí cuộn
-                carousel.scrollLeft = currentScroll;
-            }
-
-            // LOGIC RESET LẶP VÔ HẠN (cho cuộn từ Phải -> Trái)
-            // Khi cuộn về đầu (<= 0), reset về giữa bộ nhân đôi để tiếp tục mượt.
-            const totalWidth = carousel.scrollWidth;
-            singleSetWidth = totalWidth / 2;
-
-            if (carousel.scrollLeft <= 0) {
-                carousel.scrollLeft = singleSetWidth;
-                currentScroll = singleSetWidth;
-            }
-
-            // Đảm bảo cập nhật startTime để tính toán tiến độ cuộn chính xác
-            startTime = timestamp;
-
-            animationFrameId = requestAnimationFrame(animateScroll);
-        };
-
-        animationFrameId = requestAnimationFrame(animateScroll);
-
-        return () => {
-            if (animationFrameId !== null) {
-                cancelAnimationFrame(animationFrameId);
-            }
-        };
-    }, [isPaused]);
 
     // Dừng/tiếp tục cuộn khi hover hoặc chạm vào carousel
     const handleMouseEnter = () => setIsPaused(true);
@@ -121,6 +64,25 @@ const App = () => {
 
     return (
         <section className="py-12 md:py-20 bg-white dark:bg-gray-900 overflow-hidden font-sans">
+            {/* CSS Animation */}
+            <style jsx>{`
+                @keyframes scroll-left {
+                    0% {
+                        transform: translateX(0);
+                    }
+                    100% {
+                        transform: translateX(-50%);
+                    }
+                }
+                .animate-scroll-left {
+                    animation: scroll-left 30s linear infinite;
+                }
+                .animate-scroll-left:hover,
+                .animate-scroll-left.paused {
+                    animation-play-state: paused;
+                }
+            `}</style>
+
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-4 leading-tight">
                     Khách hàng nói gì về chúng tôi?
@@ -132,64 +94,67 @@ const App = () => {
 
             {/* Carousel Container với hiệu ứng Fade */}
             <div className="relative">
-                {/* Fade Left (tăng tính thẩm mỹ, che giấu điểm xuất phát/kết thúc) */}
-                <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none"></div>
+                {/* Fade Left */}
+                <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 z-10 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none"></div>
 
                 <div
-                    ref={carouselRef}
-                    // Bổ sung các lớp Tailwind cần thiết cho hiệu ứng Marquee
-                    className="flex overflow-x-hidden scroll-smooth whitespace-nowrap py-4 cursor-grab"
+                    className="overflow-hidden py-4"
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
                     onTouchStart={handleMouseEnter}
                     onTouchEnd={handleMouseLeave}
                 >
-                    {/* Lặp lại danh sách testimonial 2 lần để tạo hiệu ứng cuộn vô hạn mượt mà */}
-                    {[...testimonials, ...testimonials].map((testimonial, index) => (
-                        <div
-                            key={`${testimonial.id}-${index}`}
-                            className="inline-block w-80 md:w-96 flex-shrink-0 mx-4 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative border border-pink-100 dark:border-pink-900/50 transform hover:scale-[1.01]"
-                        >
-                            {/* Visual Hover Effect */}
-                            <div className="absolute inset-0 bg-transparent group-hover:bg-pink-50/5 dark:group-hover:bg-white/5 transition-all duration-300 rounded-2xl"></div>
+                    <div
+                        className={`flex gap-6 animate-scroll-left ${isPaused ? 'paused' : ''}`}
+                        style={{ width: 'fit-content' }}
+                    >
+                        {/* Lặp lại danh sách testimonial 2 lần để tạo hiệu ứng cuộn vô hạn mượt mà */}
+                        {[...testimonials, ...testimonials].map((testimonial, index) => (
+                            <div
+                                key={`${testimonial.id}-${index}`}
+                                className="w-80 md:w-96 flex-shrink-0 p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 relative border border-pink-100 dark:border-pink-900/50 transform hover:scale-105 hover:-translate-y-2 group"
+                            >
+                                {/* Visual Hover Effect */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-pink-50/50 to-purple-50/50 dark:from-pink-900/10 dark:to-purple-900/10 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-2xl"></div>
 
-                            <div className="flex items-center mb-4">
-                                {/* ĐÃ THAY THẾ next/image BẰNG THẺ <img> TIÊU CHUẨN */}
-                                <img
-                                    src={testimonial.avatar}
-                                    alt={testimonial.name}
-                                    width={48}
-                                    height={48}
-                                    // Đảm bảo CSS cho thẻ img vẫn áp dụng đúng kích thước và kiểu dáng
-                                    className="rounded-full object-cover border-2 border-pink-500 ring-2 ring-white dark:ring-gray-800 h-12 w-12"
-                                />
-                                <div className="ml-3 text-left">
-                                    <p className="text-base font-semibold text-gray-900 dark:text-white">{testimonial.name}</p>
-                                    <p className="text-sm text-pink-600 dark:text-pink-400 font-medium">{testimonial.username}</p>
+                                <div className="relative z-10">
+                                    <div className="flex items-center mb-4">
+                                        <img
+                                            src={testimonial.avatar}
+                                            alt={testimonial.name}
+                                            width={48}
+                                            height={48}
+                                            className="rounded-full object-cover border-2 border-pink-500 ring-2 ring-white dark:ring-gray-800 h-12 w-12 transition-transform duration-300 group-hover:scale-110"
+                                        />
+                                        <div className="ml-3 text-left">
+                                            <p className="text-base font-semibold text-gray-900 dark:text-white">{testimonial.name}</p>
+                                            <p className="text-sm text-pink-600 dark:text-pink-400 font-medium">{testimonial.username}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Star Rating */}
+                                    <div className="flex items-center mb-4">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star
+                                                key={i}
+                                                size={18}
+                                                className={`transition-all duration-300 ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400 group-hover:scale-110' : 'text-gray-300 dark:text-gray-500'}`}
+                                            />
+                                        ))}
+                                        <span className="ml-2 text-sm font-bold text-gray-700 dark:text-gray-300">{testimonial.rating}.0</span>
+                                    </div>
+
+                                    <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed whitespace-normal italic">
+                                        &ldquo;{testimonial.comment}&rdquo;
+                                    </p>
                                 </div>
                             </div>
-
-                            {/* Star Rating */}
-                            <div className="flex items-center mb-4">
-                                {[...Array(5)].map((_, i) => (
-                                    <Star
-                                        key={i}
-                                        size={18}
-                                        className={i < testimonial.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 dark:text-gray-500'}
-                                    />
-                                ))}
-                                <span className="ml-2 text-sm font-bold text-gray-700 dark:text-gray-300">{testimonial.rating}.0</span>
-                            </div>
-
-                            <p className="text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed whitespace-normal italic">
-                                &ldquo;{testimonial.comment}&rdquo;
-                            </p>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
 
-                {/* Fade Right (tăng tính thẩm mỹ) */}
-                <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none"></div>
+                {/* Fade Right */}
+                <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 z-10 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none"></div>
             </div>
         </section>
     );

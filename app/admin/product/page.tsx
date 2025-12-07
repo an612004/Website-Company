@@ -70,22 +70,13 @@ const mockProducts: Product[] = [
         rating: 4.5
     },
 ];
-
-// Xóa mockManufacturers, mockCategories vì đã dùng API
-
-// --- Component Định dạng Tiền Tệ ---
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
 };
-
-// ===================================
-// 1. MODAL QUẢN LÝ HÃNG SẢN XUẤT
-// ===================================
 interface ManufacturerModalProps {
     open: boolean;
     onClose: () => void;
 }
-
 const ManufacturerModal: React.FC<ManufacturerModalProps> = ({ open, onClose }) => {
     const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
     const [name, setName] = useState("");
@@ -94,8 +85,6 @@ const ManufacturerModal: React.FC<ManufacturerModalProps> = ({ open, onClose }) 
     const [editId, setEditId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [editCountry, setEditCountry] = useState("");
-
-    // Lấy danh sách hãng từ API khi mở modal
     React.useEffect(() => {
         if (open) {
             fetch("/api/admin/manufacturer")
@@ -124,13 +113,11 @@ const ManufacturerModal: React.FC<ManufacturerModalProps> = ({ open, onClose }) 
             alert(data.error || "Lỗi thêm hãng sản xuất!");
         }
     };
-
     const handleEdit = (man: Manufacturer) => {
         setEditId(man._id);
         setEditName(man.name);
         setEditCountry(man.country);
     };
-
     const handleEditSave = async () => {
         if (!editId || !editName || !editCountry) return;
         setLoading(true);
@@ -150,7 +137,6 @@ const ManufacturerModal: React.FC<ManufacturerModalProps> = ({ open, onClose }) 
             alert(data.error || "Lỗi cập nhật hãng!");
         }
     };
-
     const handleDelete = async (id: string) => {
         if (!window.confirm("Bạn có chắc muốn xóa hãng này?")) return;
         setLoading(true);
@@ -167,9 +153,6 @@ const ManufacturerModal: React.FC<ManufacturerModalProps> = ({ open, onClose }) 
             alert(data.error || "Lỗi xóa hãng!");
         }
     };
-
-    // ...existing code for edit/delete (chưa làm API xoá/sửa)
-
     return (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex justify-center items-center p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 relative animate-scale-in">
@@ -264,15 +247,10 @@ const ManufacturerModal: React.FC<ManufacturerModalProps> = ({ open, onClose }) 
         </div>
     );
 };
-
-// ===================================
-// 2. MODAL QUẢN LÝ LOẠI SẢN PHẨM
-// ===================================
 interface CategoryModalProps {
     open: boolean;
     onClose: () => void;
 }
-
 const CategoryModal: React.FC<CategoryModalProps> = ({ open, onClose }) => {
     const [categories, setCategories] = useState<Category[]>([]);
     const [name, setName] = useState("");
@@ -437,12 +415,6 @@ const CategoryModal: React.FC<CategoryModalProps> = ({ open, onClose }) => {
         </div>
     );
 };
-
-
-// ===================================
-// 3. MODAL CHI TIẾT SẢN PHẨM (Không đổi)
-// ===================================
-
 interface ProductModalProps {
     open: boolean;
     onClose: () => void;
@@ -598,10 +570,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, product }) =
     );
 };
 
-
-// ===================================
-// 4. COMPONENT CHÍNH: PRODUCT PAGE
-// ===================================
 export default function ProductPage() {
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -759,7 +727,6 @@ export default function ProductPage() {
                     </table>
                 </div>
             </div>
-
             {/* 4. CÁC MODAL HIỂN THỊ */}
             <ProductModal
                 open={isProductModalOpen}

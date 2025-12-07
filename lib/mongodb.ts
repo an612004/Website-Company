@@ -9,7 +9,7 @@ if (!MONGODB_URI) {
 type GlobalWithMongoose = typeof globalThis & { mongoose?: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } };
 const cached = (global as GlobalWithMongoose).mongoose || { conn: null, promise: null };
 
-async function dbConnect() {
+async function connectDB() {
   if (cached.conn) {
     return cached.conn;
   }
@@ -25,4 +25,4 @@ async function dbConnect() {
   return cached.conn;
 }
 
-export default dbConnect;
+export default connectDB;

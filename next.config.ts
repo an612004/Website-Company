@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Allow loading avatars from Unsplash used in the demo testimonials
     remotePatterns: [
       {
         protocol: 'https',
@@ -10,10 +9,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-      // Allow Google profile photos
       {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
         port: '',
         pathname: '/**',
       },

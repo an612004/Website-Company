@@ -12,6 +12,7 @@ export interface IProduct extends Document {
   manufacturer: string; // manufacturer _id
   sold: number;
   rating: number;
+  link: string; // link sản phẩm
 }
 
 const ProductSchema: Schema = new Schema({
@@ -26,6 +27,7 @@ const ProductSchema: Schema = new Schema({
   manufacturer: { type: Schema.Types.ObjectId, ref: 'Manufacturer', required: true },
   sold: { type: Number, default: 0 },
   rating: { type: Number, default: 0 },
+  link: { type: String, default: '' },
 });
 
 export default mongoose.models.Product || mongoose.model<IProduct>('Product', ProductSchema);

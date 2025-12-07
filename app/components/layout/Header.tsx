@@ -2,11 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-// Thêm icon HardHat và Code cho Sản phẩm
-import { Phone, ChevronDown, Menu, X, User2, Globe, HardHat, Code } from 'lucide-react';
-import LoginModal from '../ui/LoginModal';
-import ConfirmLogoutModal from '../ui/ConfirmLogoutModal';
-import useFirebaseAuth from '../../hooks/useFirebaseAuth';
+import { ChevronDown, Menu, X, ShoppingCart } from 'lucide-react';
+import Profile from './Profile';
 import { usePathname } from 'next/navigation';
 
 function Header() {
@@ -21,8 +18,6 @@ function Header() {
     const [open, setOpen] = useState(false);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
     const [isProductOpen, setIsProductOpen] = useState(false); // 💡 State MỚI cho Product Dropdown
-    const [showLoginModal, setShowLoginModal] = useState(false);
-    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     const servicesRef = useRef<HTMLDivElement | null>(null);
     const servicesButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -72,7 +67,7 @@ function Header() {
             contact: "Liên hệ",
             product: "Sản phẩm",
             news: "Tin tức",
-            logo: "Anbi Solutions",
+            logo: "Anbi ",
             service: "Dịch vụ",
             login: "Đăng nhập",
             logout: "Đăng xuất",
@@ -86,13 +81,13 @@ function Header() {
             langFull: "Tiếng Việt",
             flag: "🇻🇳",
             services: [
-                { href: "/dich-vu/thiet-ke-web", icon: "🌐", vi: "Thiết kế web", en: "Web design" },
-                { href: "/dich-vu/thiet-ke-web-gia-re", icon: "💸", vi: "Thiết kế portfolio", en: "Portfolio design" },
+                { href: "/servicess/design-web", icon: "", vi: "Thiết kế web", en: "Web design" },
+                // { href: "/servicess/design-portfolio", icon: "", vi: "Thiết kế portfolio", en: "Portfolio design" },
             ],
             // 💡 DỮ LIỆU PRODUCT
             products: [
-                { href: "/product/phan-cung", icon: "💻", vi: "Phần cứng & Thiết bị", en: "Hardware & Devices" },
-                { href: "/product/san-pham-so", icon: "📱", vi: "Sản phẩm số", en: "Digital Products" },
+                { href: "/product/phan-cung", icon: "", vi: "Phần cứng & Thiết bị", en: "Hardware & Devices" },
+                { href: "/product/san-pham-so", icon: "", vi: "Sản phẩm số", en: "Digital Products" },
             ]
         },
         en: {
@@ -102,7 +97,7 @@ function Header() {
             product: "Product",
             logout: "Logout",
             news: "News",
-            logo: "Anbi Solutions",
+            logo: "Anbi ",
             service: "Services",
             login: "Login",
             callUs: "Call Us",
@@ -115,8 +110,8 @@ function Header() {
             langFull: "English",
             flag: "🇺🇸",
             services: [
-                { href: "/dich-vu/thiet-ke-web", icon: "🌐", vi: "Thiết kế web", en: "Web design" },
-                { href: "/dich-vu/thiet-ke-web-gia-re", icon: "💸", vi: "Thiết kế portfolio", en: "Portfolio design" },
+                { href: "/servicess/design-web", icon: "🌐", vi: "Thiết kế web", en: "Web design" },
+                { href: "/servicess/portfolio", icon: "💸", vi: "Thiết kế portfolio", en: "Portfolio design" },
             ],
             // 💡 DỮ LIỆU PRODUCT
             products: [
@@ -191,48 +186,15 @@ function Header() {
         }
     }
 
-    // Login modal handlers
-    const openLoginModal = () => setShowLoginModal(true);
-    const closeLoginModal = () => setShowLoginModal(false);
-
-    // Close modal on Escape
-    useEffect(() => {
-        if (!showLoginModal) return;
-        const onKey = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') closeLoginModal();
-        };
-        document.addEventListener('keydown', onKey);
-        return () => document.removeEventListener('keydown', onKey);
-    }, [showLoginModal]);
-
-    // Auth state and actions from Firebase
-    const { user, loading, signInWithGoogle, signOut } = useFirebaseAuth();
-
-    // If the user becomes authenticated, ensure the login modal is closed
-    useEffect(() => {
-        if (user) {
-            setShowLoginModal(false);
-        }
-    }, [user]);
-
-    const handleGoogleSignIn = async () => {
-        if (!signInWithGoogle) return;
-        try {
-            await signInWithGoogle();
-            closeLoginModal();
-        } catch (err) {
-            console.error('Google sign-in failed', err);
-            throw err;
-        }
+    // Profile texts for the Profile component
+    const profileTexts = {
+        login: currentLangText.login,
+        logout: currentLangText.logout,
+        confirmLogoutTitle: currentLangText.confirmLogoutTitle,
+        confirmLogoutMessage: currentLangText.confirmLogoutMessage,
+        confirmLogoutCancel: currentLangText.confirmLogoutCancel,
+        confirmLogoutConfirm: currentLangText.confirmLogoutConfirm,
     };
-
-    function getInitials(name?: string | null, email?: string | null) {
-        const source = name || email || '';
-        const parts = source.split(/\s+/).filter(Boolean);
-        if (parts.length === 0) return 'U';
-        if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
-        return (parts[0].slice(0, 1) + parts[parts.length - 1].slice(0, 1)).toUpperCase();
-    }
 
     return (
         <>
@@ -277,6 +239,7 @@ function Header() {
                                         closeTimeoutRef.current = null;
                                     }
                                     setIsServicesOpen(true);
+                                    setIsProductOpen(false);
                                 }}
                                 onMouseLeave={() => {
                                     closeTimeoutRef.current = window.setTimeout(() => {
@@ -291,42 +254,54 @@ function Header() {
                                         onClick={() => setIsServicesOpen(s => !s)}
                                         aria-expanded={isServicesOpen}
                                         aria-haspopup="menu"
-                                        className="flex items-center gap-1"
+                                        className={`flex items-center gap-1 ${isActivePath('/servicess') ? 'text-blue-600' : ''}`}
                                     >
                                         {currentLangText.service}
                                         <ChevronDown size={18} className={`transition-transform duration-300 ${isServicesOpen ? 'rotate-180' : 'rotate-0'}`} />
                                     </button>
                                 </div>
 
+                                {/* Dropdown thẳng hàng với mục chính */}
                                 <div
                                     ref={servicesRef}
-                                    // ✅ ĐÃ SỬA: Thay đổi left-1/2 -translate-x-1/2 thành left-0
-                                    className={`${isServicesOpen ? 'grid' : 'hidden'} absolute left-0 top-full
-                                    mt-4 w-[480px] bg-white border border-gray-100 rounded-2xl shadow-2xl p-6
-                                    grid-cols-2 gap-4 z-20 animate-fade-in-down`}
-                                    style={{ animationDuration: '0.3s' }}
+                                    className={`${isServicesOpen ? 'block' : 'hidden'} absolute left-1/2 -translate-x-1/2 top-full pt-2 z-20`}
                                     role="menu"
                                 >
-                                    {currentLangText.services.map((item) => {
-                                        const active = isActivePath(item.href) || hoveredService === item.href;
-                                        return (
-                                            <Link
-                                                key={item.href}
-                                                href={item.href}
-                                                className={`${serviceLinkClass} ${active ? 'bg-blue-50 text-blue-700' : ''}`}
-                                                onClick={() => { setOpen(false); setIsServicesOpen(false); setHoveredService(null); }}
-                                                onMouseEnter={() => setHoveredService(item.href)}
-                                                onMouseLeave={() => setHoveredService(null)}
-                                            >
-                                                <span className="text-xl">{item.icon}</span>
-                                                <span className="text-sm font-medium">{lang === "vi" ? item.vi : item.en}</span>
-                                            </Link>
-                                        );
-                                    })}
+                                    <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden min-w-[200px]">
+                                        {/* Mũi tên chỉ lên */}
+                                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-l border-t border-gray-100 rotate-45"></div>
+
+                                        <div className="py-2">
+                                            {currentLangText.services.map((item, index) => {
+                                                const active = isActivePath(item.href) || hoveredService === item.href;
+                                                return (
+                                                    <Link
+                                                        key={item.href}
+                                                        href={item.href}
+                                                        className={`
+                                                            flex items-center gap-3 px-5 py-3 text-sm font-medium
+                                                            transition-all duration-200
+                                                            ${active
+                                                                ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-l-3 border-blue-500'
+                                                                : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:pl-6'
+                                                            }
+                                                            ${index !== currentLangText.services.length - 1 ? 'border-b border-gray-50' : ''}
+                                                        `}
+                                                        onClick={() => { setOpen(false); setIsServicesOpen(false); setHoveredService(null); }}
+                                                        onMouseEnter={() => setHoveredService(item.href)}
+                                                        onMouseLeave={() => setHoveredService(null)}
+                                                    >
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                                        {lang === "vi" ? item.vi : item.en}
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
                             </li>
 
-                            {/* 💡 PRODUCT DROPDOWN DESKTOP (MỚI) */}
+                            {/* PRODUCT DROPDOWN DESKTOP */}
                             <li
                                 className="relative cursor-pointer"
                                 onMouseEnter={() => {
@@ -335,6 +310,7 @@ function Header() {
                                         closeTimeoutRef.current = null;
                                     }
                                     setIsProductOpen(true);
+                                    setIsServicesOpen(false);
                                 }}
                                 onMouseLeave={() => {
                                     closeTimeoutRef.current = window.setTimeout(() => {
@@ -356,32 +332,43 @@ function Header() {
                                     </button>
                                 </div>
 
-                                {/* 💡 Dropdown Content cho Sản phẩm */}
+                                {/* Dropdown thẳng hàng với mục chính */}
                                 <div
                                     ref={productsRef}
-                                    // ✅ ĐÃ SỬA: Thay đổi left-1/2 -translate-x-1/2 thành right-0
-                                    className={`${isProductOpen ? 'grid' : 'hidden'} absolute right-0 top-full
-                                    mt-4 w-[480px] bg-white border border-gray-100 rounded-2xl shadow-2xl p-6
-                                    grid-cols-2 gap-4 z-20 animate-fade-in-down`}
-                                    style={{ animationDuration: '0.3s' }}
+                                    className={`${isProductOpen ? 'block' : 'hidden'} absolute left-1/2 -translate-x-1/2 top-full pt-2 z-20`}
                                     role="menu"
                                 >
-                                    {currentLangText.products.map((item) => {
-                                        const active = isActivePath(item.href) || hoveredService === item.href;
-                                        return (
-                                            <Link
-                                                key={item.href}
-                                                href={item.href}
-                                                className={`${serviceLinkClass} ${active ? 'bg-blue-50 text-blue-700' : ''}`}
-                                                onClick={() => { setOpen(false); setIsProductOpen(false); setHoveredService(null); }}
-                                                onMouseEnter={() => setHoveredService(item.href)}
-                                                onMouseLeave={() => setHoveredService(null)}
-                                            >
-                                                <span className="text-xl">{item.icon}</span>
-                                                <span className="text-sm font-medium">{lang === "vi" ? item.vi : item.en}</span>
-                                            </Link>
-                                        );
-                                    })}
+                                    <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden min-w-[220px]">
+                                        {/* Mũi tên chỉ lên */}
+                                        <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-l border-t border-gray-100 rotate-45"></div>
+
+                                        <div className="py-2">
+                                            {currentLangText.products.map((item, index) => {
+                                                const active = isActivePath(item.href) || hoveredService === item.href;
+                                                return (
+                                                    <Link
+                                                        key={item.href}
+                                                        href={item.href}
+                                                        className={`
+                                                            flex items-center gap-3 px-5 py-3 text-sm font-medium
+                                                            transition-all duration-200
+                                                            ${active
+                                                                ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-l-3 border-blue-500'
+                                                                : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:pl-6'
+                                                            }
+                                                            ${index !== currentLangText.products.length - 1 ? 'border-b border-gray-50' : ''}
+                                                        `}
+                                                        onClick={() => { setOpen(false); setIsProductOpen(false); setHoveredService(null); }}
+                                                        onMouseEnter={() => setHoveredService(item.href)}
+                                                        onMouseLeave={() => setHoveredService(null)}
+                                                    >
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+                                                        {lang === "vi" ? item.vi : item.en}
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
                             </li>
 
@@ -394,38 +381,16 @@ function Header() {
                     {/* 💡 ACTIONS & LANGUAGE SWITCHER DESKTOP */}
                     <div className="hidden lg:flex items-center gap-3">
 
-                        {/* Login / User */}
-                        {loading ? (
-                            <div className="flex items-center gap-3">
-                                <div className="h-9 w-9 rounded-full bg-gray-100 animate-pulse" />
-                            </div>
-                        ) : user ? (
-                            <div className="flex items-center gap-3">
-                                {user.photoURL ? (
-                                    <Image src={user.photoURL} alt={user.displayName || 'User'} width={36} height={36} className="rounded-full object-cover" />
-                                ) : (
-                                    <div className="h-9 w-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold">{getInitials(user.displayName, user.email)}</div>
-                                )}
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-gray-800">{user.displayName || user.email}</span>
-                                    <button
-                                        onClick={() => setShowLogoutConfirm(true)}
-                                        className="px-3 py-2 text-sm bg-gray-100 rounded-md"
-                                    >
-                                        Đăng xuất
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={openLoginModal}
-                                className="flex items-center gap-2 px-5 py-2 text-sm font-bold text-white bg-gradient-to-r from-orange-400 to-pink-500 rounded-full hover:opacity-90 transition shadow-lg shadow-red-500/50 active:scale-95"
-                            >
-                                <User2 size={18} />
-                                <span>{currentLangText.login}</span>
-                            </button>
-                        )}
-                        <button
+                        {/* Profile Component - Desktop */}
+                        <Profile texts={profileTexts} variant="desktop" />
+                        {/* Giỏ hàng icon */}
+                        <button className="relative px-3 py-2 rounded-full hover:bg-gray-100 transition active:scale-95" aria-label="Giỏ hàng">
+                            <ShoppingCart size={22} className="text-gray-700" />
+                            {/* Badge số lượng sản phẩm (demo) */}
+                            <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-lg">0</span>
+                        </button>
+                        {/* Nút dịch */}
+                        {/* <button
                             ref={langToggleRef}
                             onClick={() => setIsLangOpen(!isLangOpen)}
                             className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-gray-700 rounded-full border border-gray-300 hover:bg-gray-100 transition active:scale-95"
@@ -433,7 +398,7 @@ function Header() {
                             <span className="text-xl">{currentLangText.flag}</span>
                             <span>{currentLangText.langCode}</span>
                             <ChevronDown size={16} className={`transition-transform duration-200 ${isLangOpen ? 'rotate-180' : 'rotate-0'}`} />
-                        </button>
+                        </button> */}
                         {isLangOpen && (
                             <div ref={langMenuRef} className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-xl z-30 animate-fade-in-down"
                                 style={{ animationDuration: '0.2s' }}
@@ -458,15 +423,19 @@ function Header() {
 
                     {/* MOBILE MENU BUTTON & LANGUAGE TOGGLE (MOBILE) */}
                     <div className="lg:hidden flex items-center gap-2">
-                        {/* 💡 2. NÚT CHUYỂN NGÔN NGỮ ĐƠN GIẢN TRÊN HEADER MOBILE */}
-                        <button
+                        {/* Giỏ hàng icon mobile */}
+                        <button className="relative px-2 py-2 rounded-full hover:bg-gray-100 transition active:scale-95" aria-label="Giỏ hàng">
+                            <ShoppingCart size={22} className="text-gray-700" />
+                            <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-lg">0</span>
+                        </button>
+                        {/* Nút chuyển ngôn ngữ */}
+                        {/* <button
                             onClick={() => handleLangToggle(langAlt as LangKey)}
                             className="text-gray-800 p-2 rounded-lg hover:bg-gray-100 active:scale-95 transition flex items-center gap-1 font-bold text-sm"
                         >
                             <Globe size={24} className="text-blue-600" />
                             {currentLangText.langCode}
-                        </button>
-
+                        </button> */}
                         {/* Mobile Menu Button */}
                         <button
                             onClick={() => setOpen(!open)}
@@ -549,20 +518,9 @@ function Header() {
                                 </div>
                             </details>
 
-                            {/* ACTIONS MOBILE */}
+                            {/* ACTIONS MOBILE - Profile Component */}
                             <div className="flex flex-col gap-3 mt-6 border-t pt-4">
-                                <button
-                                    onClick={() => { openLoginModal(); setOpen(false); }}
-                                    className="flex items-center justify-center gap-2 w-full px-5 py-3 text-sm font-bold text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition"
-                                >
-                                    <User2 size={18} /> {currentLangText.login}
-                                </button>
-                                <a href="tel:0987654321"
-                                    className="flex items-center justify-center gap-2 w-full px-5 py-3 text-sm font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition shadow-lg shadow-blue-500/50"
-                                    onClick={() => setOpen(false)}
-                                >
-                                    <Phone size={18} /> {currentLangText.callUs}
-                                </a>
+                                <Profile texts={profileTexts} variant="mobile" onMenuClose={() => setOpen(false)} />
                             </div>
 
                         </ul>
@@ -570,28 +528,6 @@ function Header() {
                 </div>
             </header>
 
-            <LoginModal open={showLoginModal} onClose={closeLoginModal} onGoogleSignIn={handleGoogleSignIn} />
-            <ConfirmLogoutModal
-                open={showLogoutConfirm}
-                onClose={() => setShowLogoutConfirm(false)}
-                onConfirm={async () => {
-                    try {
-                        await signOut();
-                        // reload to reset any popup/COOP state and ensure a clean client state
-                        if (typeof window !== 'undefined') {
-                            window.location.reload();
-                        }
-                    } catch (e) {
-                        console.error(e);
-                    } finally {
-                        setShowLogoutConfirm(false);
-                    }
-                }}
-                title={currentLangText.confirmLogoutTitle}
-                message={currentLangText.confirmLogoutMessage}
-                cancelLabel={currentLangText.confirmLogoutCancel}
-                confirmLabel={currentLangText.confirmLogoutConfirm}
-            />
         </>
     );
 }

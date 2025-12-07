@@ -1,20 +1,36 @@
 "use client";
 import { useEffect, useState } from "react";
 
-const images = [
-    "/banner.png",
-    "/banner.png",
-    "/banner3.jpg"
-];
+
+export interface BannerItem {
+    url: string;
+    alt?: string;
+}
 
 export default function Banner() {
+    const [banners, setBanners] = useState<BannerItem[]>([]);
     const [index, setIndex] = useState(0);
     useEffect(() => {
+        // Lấy danh sách banner từ API
+        const fetchBanners = async () => {
+            try {
+                const res = await fetch('/api/banners');
+                const data = await res.json();
+                if (data.banners) setBanners(data.banners);
+            } catch (err) {
+                console.error('Lỗi lấy banner:', err);
+            }
+        };
+        fetchBanners();
+    }, []);
+
+    useEffect(() => {
+        if (banners.length === 0) return;
         const timer = setInterval(() => {
-            setIndex(i => (i + 1) % images.length);
+            setIndex(i => (i + 1) % banners.length);
         }, 2000);
         return () => clearInterval(timer);
-    }, []);
+    }, [banners]);
     // Animated orange text
     const orangeWords = ["Công Việc", "Học Tập", "Hệ Thống", "Mở Rộng", "Phát Triển"]; // you can change these
     const [orangeIndex, setOrangeIndex] = useState(0);
@@ -38,11 +54,11 @@ export default function Banner() {
 
     return (
         <div className="relative w-full h-80 md:h-[530px] overflow-hidden flex items-center justify-center">
-            {images.map((src, i) => (
+            {banners.map((banner, i) => (
                 <img
-                    key={src + i}
-                    src={src}
-                    alt={`Banner ${i + 1}`}
+                    key={banner.url + i}
+                    src={banner.url}
+                    alt={banner.alt || `Banner ${i + 1}`}
                     className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-700 ${i === index ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                 />
             ))}
@@ -68,7 +84,7 @@ export default function Banner() {
                 </div>
             </div>
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                {images.map((_, i) => (
+                {banners.map((_, i) => (
                     <span key={i} className={`w-3 h-3 rounded-full ${i === index ? 'bg-yellow-500' : 'bg-white'} border border-yellow-500 transition-all`}></span>
                 ))}
             </div>

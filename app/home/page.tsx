@@ -7,6 +7,7 @@ import FeatureSection from "../components/ui/FeatureSection";
 import LogoTicker from "../components/ui/LogoTicker";
 import StatsCounter from "../components/ui/StatsCounter";
 import TestimonialCarousel from "../components/ui/Testimonials";
+import SideWebsite from "../components/ui/SideWebsite";
 export default function Home() {
 
     return (
@@ -25,6 +26,10 @@ export default function Home() {
             <div>
                 <LogoTicker />
             </div>
+            <div>
+                <SideWebsite />
+            </div>
+
             <div>
                 <StatsCounter />
             </div>

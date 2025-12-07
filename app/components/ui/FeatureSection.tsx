@@ -110,49 +110,64 @@ export default function FeatureSection() {
     }
 
     return (
-        <section className="py-12 md:py-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-10 sm:py-14 md:py-20 bg-gradient-to-br from-slate-50 via-white to-blue-50/30 relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-teal-200/20 to-blue-200/20 rounded-full blur-3xl" />
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-blue-200/20 to-purple-200/20 rounded-full blur-3xl" />
+            </div>
+
+            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative z-10">
                 {/* TIÊU ĐỀ SECTION */}
-                <div className="text-center mb-12">
-                    <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
+                <div className="text-center mb-8 sm:mb-10 md:mb-14">
+                    <span className="inline-block px-4 py-1.5 mb-4 text-xs sm:text-sm font-semibold text-teal-600 bg-teal-50 rounded-full border border-teal-100">
+                        🚀 Dịch vụ chuyên nghiệp
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight">
+                        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-teal-500 to-cyan-500 animate-gradient">
                             Dịch Vụ chỉ có Tại Anbi
                         </span>
                     </h2>
-                    <p className="mt-4 text-xl text-gray-600">
+                    <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg lg:text-xl text-gray-500 max-w-2xl mx-auto px-4">
                         Giải pháp toàn diện từ Website, Phần mềm, Phần cứng đến Marketing.
                     </p>
                 </div>
 
                 {/* CONTAINER TABS CHÍNH */}
-                <div className="bg-white rounded-3xl shadow-2xl shadow-blue-200/50 p-4 md:p-8 relative overflow-hidden border border-gray-100">
+                <div className="bg-white/80 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-xl shadow-blue-100/50 p-3 sm:p-5 md:p-8 relative overflow-hidden border border-white/50 ring-1 ring-gray-100/50">
+                    {/* Subtle gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/50 via-transparent to-blue-50/30 pointer-events-none" />
 
-                    {/* Loading animation overlay (Sử dụng CSS hiện đại hơn) */}
+                    {/* Loading animation overlay */}
                     {loading && (
-                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/90 backdrop-blur-sm animate-fadeIn">
-                            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-md">
+                            <div className="relative">
+                                <div className="w-12 h-12 sm:w-16 sm:h-16 border-4 border-teal-500/20 rounded-full" />
+                                <div className="absolute inset-0 w-12 h-12 sm:w-16 sm:h-16 border-4 border-transparent border-t-teal-500 rounded-full animate-spin" />
+                            </div>
                         </div>
                     )}
 
-                    {/* 💡 1. TABS MENU: Horizontal Tab Pill Style (Đẹp và Hiện đại) */}
-                    <div className="relative p-1 bg-gray-100 rounded-xl mb-10 overflow-x-auto">
-                        <div className="flex space-x-2 md:space-x-4 min-w-max">
+                    {/* 💡 1. TABS MENU: Modern Pill Style */}
+                    <div className="relative p-1 sm:p-1.5 bg-gradient-to-r from-gray-100 to-gray-50 rounded-xl sm:rounded-2xl mb-6 sm:mb-8 md:mb-10 overflow-x-auto scrollbar-hide z-10">
+                        <div className="flex gap-1 sm:gap-2 min-w-max">
                             {tabsData.map((t) => (
                                 <button
                                     key={t.id}
                                     onClick={() => setActive(t.id)}
                                     className={`
-                                        flex items-center gap-3 px-5 py-3 rounded-xl transition-all duration-300 font-semibold text-base whitespace-nowrap 
+                                        group relative flex items-center gap-1.5 sm:gap-2 md:gap-3 px-3 sm:px-4 md:px-6 py-2 sm:py-2.5 md:py-3.5 rounded-lg sm:rounded-xl transition-all duration-300 font-medium text-xs sm:text-sm md:text-base whitespace-nowrap
                                         ${active === t.id
-                                            ? "bg-gradient-to-r from-teal-500 to-blue-500 text-white shadow-lg shadow-teal-500/30"
-                                            : "text-gray-700 hover:bg-white hover:text-blue-600"
+                                            ? "bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 text-white shadow-lg shadow-teal-500/25 scale-[1.02]"
+                                            : "text-gray-600 hover:text-gray-900 hover:bg-white/80 hover:shadow-md"
                                         }
                                     `}
                                 >
-                                    <div className={`${active === t.id ? "" : "text-teal-600"}`}>
+                                    <div className={`transition-transform duration-300 [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 ${active === t.id ? "scale-110" : "text-teal-500 group-hover:scale-110"}`}>
                                         {t.icon}
                                     </div>
-                                    {t.title}
+                                    <span className="hidden md:inline font-semibold">{t.title}</span>
+                                    <span className="md:hidden font-semibold">{t.title.split(' ').slice(0, 2).join(' ')}</span>
                                 </button>
                             ))}
                         </div>
@@ -164,25 +179,66 @@ export default function FeatureSection() {
                     </div>
 
                 </div>
-                {/* Thêm CSS cho animations */}
+                {/* Modern CSS animations */}
                 <style jsx global>{`
                     @keyframes fadeIn {
                         0% { opacity: 0; }
                         100% { opacity: 1; }
                     }
+                    @keyframes slideIn {
+                        0% { opacity: 0; transform: translateY(20px); }
+                        100% { opacity: 1; transform: translateY(0); }
+                    }
+                    @keyframes float {
+                        0%, 100% { transform: translateY(0) rotate(-3deg); }
+                        50% { transform: translateY(-10px) rotate(-3deg); }
+                    }
+                    @keyframes bounce-slow {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-8px); }
+                    }
+                    @keyframes pulse-slow {
+                        0%, 100% { opacity: 0.5; transform: scale(1); }
+                        50% { opacity: 0.8; transform: scale(1.05); }
+                    }
+                    @keyframes gradient {
+                        0% { background-position: 0% 50%; }
+                        50% { background-position: 100% 50%; }
+                        100% { background-position: 0% 50%; }
+                    }
                     .animate-fadeIn {
-                        animation: fadeIn 0.7s ease-out;
+                        animation: fadeIn 0.5s ease-out;
+                    }
+                    .animate-slideIn {
+                        animation: slideIn 0.6s ease-out;
+                    }
+                    .animate-float {
+                        animation: float 4s ease-in-out infinite;
+                    }
+                    .animate-bounce-slow {
+                        animation: bounce-slow 3s ease-in-out infinite;
+                    }
+                    .animate-pulse-slow {
+                        animation: pulse-slow 4s ease-in-out infinite;
+                    }
+                    .animate-gradient {
+                        background-size: 200% 200%;
+                        animation: gradient 3s ease infinite;
+                    }
+                    .animate-spin {
+                        animation: spin 1s linear infinite;
                     }
                     @keyframes spin {
                         0% { transform: rotate(0deg); }
                         100% { transform: rotate(360deg); }
                     }
-                    .animate-spin {
-                        animation: spin 1s linear infinite;
+                    /* Hide scrollbar */
+                    .scrollbar-hide {
+                        -ms-overflow-style: none;
+                        scrollbar-width: none;
                     }
-                    @keyframes mockupIn {
-                        0% { opacity: 0; transform: translateY(20px) rotate(0deg); }
-                        100% { opacity: 1; transform: translateY(0) rotate(0deg); }
+                    .scrollbar-hide::-webkit-scrollbar {
+                        display: none;
                     }
                 `}</style>
             </div>
@@ -190,76 +246,93 @@ export default function FeatureSection() {
     );
 }
 
-// 5. COMPONENT HIỂN THỊ NỘI DUNG (Đã làm nổi bật và hiện đại hóa)
+// 5. COMPONENT HIỂN THỊ NỘI DUNG (Modern & Beautiful)
 const ContentDisplay = ({ currentTab }: { currentTab: ITab }) => {
-    // Sử dụng key để kích hoạt animation khi chuyển tab
     return (
         <div
             key={currentTab.id}
-            // 💡 Thêm min-h-toàn diện để tránh layout nhảy khi chuyển tab
-            className="flex flex-col lg:flex-row gap-12 w-full animate-fadeIn min-h-[500px] md:min-h-[400px]"
+            className="flex flex-col lg:flex-row gap-6 sm:gap-8 lg:gap-12 w-full animate-slideIn relative z-10"
         >
-            {/* Văn bản (Chiếm 50% trên Desktop) */}
-            <div className="w-full lg:w-1/2">
-                <h3 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-snug">
-                    <span className="text-blue-600">{currentTab.title}:</span> {currentTab.headline}
+            {/* Văn bản */}
+            <div className="w-full lg:w-1/2 order-2 lg:order-1 flex flex-col justify-center">
+                {/* Badge */}
+                <div className="mb-3 sm:mb-4">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs sm:text-sm font-medium text-teal-700 bg-teal-50 rounded-full border border-teal-100">
+                        <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse" />
+                        {currentTab.title}
+                    </span>
+                </div>
+
+                <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 mb-4 sm:mb-5 md:mb-6 leading-tight">
+                    {currentTab.headline}
                 </h3>
-                <div className="space-y-5 mb-8">
+
+                <div className="space-y-2.5 sm:space-y-3 md:space-y-4 mb-6 sm:mb-8">
                     {currentTab.content.map((item: string, i: number) => (
-                        <div key={i} className="flex gap-4 text-gray-700 items-start">
-                            <span className="flex-shrink-0 mt-1 text-teal-500">
-                                <CheckCircle size={20} fill="currentColor" />
+                        <div
+                            key={i}
+                            className="flex gap-2.5 sm:gap-3 items-start p-2.5 sm:p-3 rounded-xl bg-gradient-to-r from-gray-50 to-transparent hover:from-teal-50 hover:to-transparent transition-all duration-300 group"
+                            style={{ animationDelay: `${i * 0.1}s` }}
+                        >
+                            <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-teal-400 to-cyan-500 rounded-full flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" strokeWidth={3} />
                             </span>
-                            <p className="flex-1 text-lg font-medium">{item}</p>
+                            <p className="flex-1 text-xs sm:text-sm md:text-base text-gray-600 leading-relaxed group-hover:text-gray-900 transition-colors">{item}</p>
                         </div>
                     ))}
                 </div>
-                <a href={currentTab.ctaLink}
-                    className="inline-flex items-center gap-2 mt-4 bg-gradient-to-r from-teal-500 to-blue-500 text-white px-8 py-3 rounded-full text-lg font-bold shadow-xl transition-all transform hover:scale-[1.04] active:scale-95 shadow-blue-500/50"
+
+                <a
+                    href={currentTab.ctaLink}
+                    className="inline-flex items-center gap-2 w-fit bg-gradient-to-r from-teal-500 via-cyan-500 to-blue-500 text-white px-5 sm:px-6 md:px-8 py-2.5 sm:py-3 md:py-3.5 rounded-xl sm:rounded-2xl text-sm sm:text-base font-bold shadow-lg shadow-teal-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-teal-500/30 hover:-translate-y-0.5 active:translate-y-0 group"
                 >
-                    {currentTab.ctaText} →
+                    <span>{currentTab.ctaText}</span>
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
                 </a>
             </div>
 
-            {/* Hình ảnh (Mockup 3D Hiện đại - Chiếm 50% trên Desktop) */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center relative min-h-[350px]">
-                {/* Mockup 1: Tablet (Lớn hơn, phía sau) */}
-                <Image
-                    src={currentTab.imageSrc.tablet}
-                    alt={`${currentTab.imageAlt} (Tablet)`}
-                    width={450}
-                    height={300}
-                    className="absolute z-10 drop-shadow-2xl transition-all duration-1000 animate-mockupIn max-w-full h-auto"
-                    style={{
-                        transform: 'rotate(-5deg) translateX(10%)',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-                        borderRadius: '1.5rem',
-                        animationDelay: '0.1s'
-                    }}
-                    unoptimized
-                />
+            {/* Hình ảnh Mockup */}
+            <div className="w-full lg:w-1/2 flex items-center justify-center relative min-h-[220px] sm:min-h-[280px] md:min-h-[320px] lg:min-h-[380px] order-1 lg:order-2 mb-2 sm:mb-4 lg:mb-0">
+                {/* Background glow effect */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 bg-gradient-to-br from-teal-400/20 via-cyan-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse-slow" />
+                </div>
 
-                {/* Mockup 2: Phone (Nhỏ hơn, phía trước) */}
-                <Image
-                    src={currentTab.imageSrc.phone}
-                    alt={`${currentTab.imageAlt} (Phone)`}
-                    width={180}
-                    height={350}
-                    className="absolute z-20 drop-shadow-2xl transition-all duration-1000 animate-mockupIn max-w-full h-auto"
-                    style={{
-                        transform: 'rotate(10deg) translateX(-40%) translateY(-10%)',
-                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-                        borderRadius: '1.5rem',
-                        animationDelay: '0.3s'
-                    }}
-                    unoptimized
-                />
-                {/* CSS cho mockupIn animation chỉ áp dụng trong phạm vi này (hoặc global) */}
-                <style jsx>{`
-                    .animate-mockupIn {
-                        animation: mockupIn 0.7s cubic-bezier(0.2, 0.8, 0.6, 1.2);
-                    }
-                `}</style>
+                {/* Mockup 1: Tablet */}
+                <div className="absolute z-10 animate-float" style={{ animationDelay: '0.1s' }}>
+                    <Image
+                        src={currentTab.imageSrc.tablet}
+                        alt={`${currentTab.imageAlt} (Tablet)`}
+                        width={450}
+                        height={300}
+                        className="w-[180px] sm:w-[240px] md:w-[300px] lg:w-[380px] xl:w-[420px] h-auto rounded-xl sm:rounded-2xl shadow-2xl ring-1 ring-black/5"
+                        style={{
+                            transform: 'rotate(-3deg) translateX(8%)',
+                        }}
+                        unoptimized
+                    />
+                </div>
+
+                {/* Mockup 2: Phone */}
+                <div className="absolute z-20 animate-float" style={{ animationDelay: '0.3s' }}>
+                    <Image
+                        src={currentTab.imageSrc.phone}
+                        alt={`${currentTab.imageAlt} (Phone)`}
+                        width={180}
+                        height={350}
+                        className="w-[70px] sm:w-[100px] md:w-[130px] lg:w-[160px] xl:w-[180px] h-auto rounded-lg sm:rounded-xl shadow-2xl ring-1 ring-black/5"
+                        style={{
+                            transform: 'rotate(6deg) translateX(-60%) translateY(-5%)',
+                        }}
+                        unoptimized
+                    />
+                </div>
+
+                {/* Floating elements */}
+                <div className="absolute top-4 right-4 sm:top-8 sm:right-8 w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl shadow-lg animate-bounce-slow opacity-80" style={{ animationDelay: '0.5s' }} />
+                <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 w-6 h-6 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-lg shadow-lg animate-bounce-slow opacity-80" style={{ animationDelay: '0.7s' }} />
             </div>
         </div>
     );

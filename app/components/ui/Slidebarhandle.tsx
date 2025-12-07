@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useEffect, useState } from "react";
-import { FileText, Grid, Calendar, History, Github, ChevronRight, Menu, X, } from 'lucide-react';
+import { FileText, Handshake, Grid, Calendar, History, Github, ChevronRight, Menu, X, } from 'lucide-react';
 
 export default function Slidebarhandle() {
     const ref = useRef<HTMLDivElement | null>(null);
@@ -23,7 +23,7 @@ export default function Slidebarhandle() {
     }, []);
 
     const items: { id: number; icon: React.ReactElement<{ size?: number }>; href: string }[] = [
-        { id: 1, icon: <FileText size={16} />, href: '#' },
+        { id: 1, icon: <Handshake size={16} />, href: '#' },
         { id: 2, icon: <Grid size={16} />, href: '#' },
         { id: 3, icon: <Calendar size={16} />, href: '#' },
         { id: 4, icon: <History size={16} />, href: '#' },

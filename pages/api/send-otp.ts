@@ -145,9 +145,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
         await transporter.sendMail({
           from: process.env.SENDGRID_FROM_EMAIL || process.env.GMAIL_USER,
           to: email,
-          subject: 'Mã xác thực đăng nhập',
-          text: `Mã xác thực của bạn là: ${code}. Mã hết hạn trong ${Math.floor(ttl / 60000)} phút.`,
-          html: `<p>Mã xác thực của bạn là: <strong>${code}</strong></p><p>Mã hết hạn trong ${Math.floor(ttl / 60000)} phút.</p>`,
+          subject: 'Mã xác thực đăng nhập - Anbi',
+          text: `Mã xác thực của bạn là: ${code}. Mã sẽ hết hạn trong ${Math.floor(ttl / 60000)} phút. Không chia sẻ mã này cho bất kỳ ai!`,
+          html: `
+            <div style="font-family:Segoe UI,Arial,sans-serif;background:#f8fafc;padding:32px 0;text-align:center;">
+              <div style="max-width:420px;margin:auto;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);padding:32px 24px;">
+                <img src='https://res.cloudinary.com/dg6pbubrz/image/upload/v1764504642/logi_Anbi_owe5c2.png' alt='Anbi Company' style='height:40px;margin-bottom:16px;' />
+                <h2 style="color:#ff6600;font-size:22px;margin-bottom:12px;">Xác thực đăng nhập</h2>
+                <p style="font-size:16px;color:#222;margin-bottom:18px;">Mã xác thực của bạn:</p>
+                <div style="font-size:32px;font-weight:700;letter-spacing:8px;color:#2563eb;background:#f1f5f9;border-radius:8px;display:inline-block;padding:12px 32px;margin-bottom:18px;">${code}</div>
+                <p style="font-size:15px;color:#555;margin-bottom:8px;">Mã sẽ hết hạn trong <b style='color:#e11d48'>${Math.floor(ttl / 60000)} phút</b>.</p>
+                <p style="font-size:13px;color:#e11d48;margin-bottom:8px;">Không chia sẻ mã này cho bất kỳ ai!</p>
+                <hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb;" />
+                <p style="font-size:12px;color:#888;">Anbi Company - Bảo mật & tiện lợi</p>
+              </div>
+            </div>
+          `,
         });
       } catch (smtpErr: unknown) {
         console.error('SMTP send error', smtpErr);
