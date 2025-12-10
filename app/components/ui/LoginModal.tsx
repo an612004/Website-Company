@@ -73,7 +73,7 @@ export default function LoginModal({ open, onClose, onGoogleSignIn, onGoogleSign
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 transition-opacity duration-300 backdrop-blur-sm"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }} // Thay thế bg-black/50 bằng màu đen đậm hơn cho chế độ tối
         >
             {/* Vùng nền */}
@@ -85,7 +85,7 @@ export default function LoginModal({ open, onClose, onGoogleSignIn, onGoogleSign
                 tabIndex={-1}
                 role="dialog"
                 aria-modal="true"
-                className="relative z-10 w-full max-w-sm mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.8)] transform scale-100 transition-all duration-300 ease-out animate-in fade-in zoom-in-95"
+                className="relative z-10 w-full max-w-sm mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.8)] transform scale-100 transition-all duration-300 ease-out animate-in fade-in zoom-in-95 max-h-[90vh] overflow-y-auto"
             >
                 {/* Close Button */}
                 <button

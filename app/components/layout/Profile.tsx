@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { User2, LogOut, ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { User2, LogOut, ChevronDown, Wallet, Settings, ShoppingBag, Heart } from 'lucide-react';
 import useFirebaseAuth from '../../hooks/useFirebaseAuth';
 import LoginModal from '../ui/LoginModal';
 import ConfirmLogoutModal from '../ui/ConfirmLogoutModal';
@@ -22,6 +23,7 @@ interface ProfileProps {
 }
 
 function Profile({ texts, variant = 'desktop', onMenuClose }: ProfileProps) {
+    const router = useRouter();
     const { user, loading, signInWithGoogle, signOut } = useFirebaseAuth();
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -79,7 +81,6 @@ function Profile({ texts, variant = 'desktop', onMenuClose }: ProfileProps) {
 
     const openLoginModal = () => {
         setShowLoginModal(true);
-        onMenuClose?.();
     };
 
     function getInitials(name?: string | null, email?: string | null) {
@@ -146,6 +147,63 @@ function Profile({ texts, variant = 'desktop', onMenuClose }: ProfileProps) {
 
                                 {/* Actions */}
                                 <div className="py-2">
+                                    {/* Số dư tài khoản */}
+                                    <div className="px-4 py-2 border-b border-gray-100">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <Wallet size={16} />
+                                                <span className="text-sm">Số dư tài khoản</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <span className="text-sm font-bold text-blue-600">0đ</span>
+                                                <button onClick={() => {
+                                                    setShowDropdown(false);
+                                                    router.push('../topup');
+                                                }} className="ml-1 w-5 h-5 flex items-center justify-center bg-blue-500 text-white rounded-full text-xs font-bold hover:bg-blue-600 transition">
+                                                    +
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Quản lý tài khoản */}
+                                    <button
+                                        onClick={() => {
+                                            setShowDropdown(false);
+                                            router.push('../user/account');
+                                        }}
+                                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                                    >
+                                        <Settings size={18} />
+                                        <span>Quản lý tài khoản</span>
+                                    </button>
+
+                                    {/* Lịch sử đơn hàng */}
+                                    <button
+                                        onClick={() => {
+                                            setShowDropdown(false);
+                                            router.push('../user/orders');
+                                        }}
+                                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                                    >
+                                        <ShoppingBag size={18} />
+                                        <span>Lịch sử đơn hàng</span>
+                                    </button>
+
+                                    {/* Sản phẩm yêu thích */}
+                                    <button
+                                        onClick={() => {
+                                            setShowDropdown(false);
+                                            router.push('../user/favorites');
+                                        }}
+                                        className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition"
+                                    >
+                                        <Heart size={18} />
+                                        <span>Sản phẩm yêu thích</span>
+                                    </button>                                    {/* Divider */}
+                                    <div className="border-t border-gray-100 my-1"></div>
+
+                                    {/* Đăng xuất */}
                                     <button
                                         onClick={() => {
                                             setShowDropdown(false);
@@ -223,6 +281,61 @@ function Profile({ texts, variant = 'desktop', onMenuClose }: ProfileProps) {
                             </p>
                             <p className="text-xs text-gray-500 truncate">{user.email}</p>
                         </div>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+                        {/* Số dư tài khoản */}
+                        <div className="px-4 py-3 border-b border-gray-100">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3 text-gray-600">
+                                    <Wallet size={18} />
+                                    <span className="text-sm">Số dư tài khoản</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm font-bold text-blue-600">0đ</span>
+                                    <button className="w-6 h-6 flex items-center justify-center bg-blue-500 text-white rounded-full text-xs font-bold hover:bg-blue-600 transition active:scale-95">
+                                        +
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Quản lý tài khoản */}
+                        <button
+                            onClick={() => {
+                                onMenuClose?.();
+                                router.push('/account');
+                            }}
+                            className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition active:bg-gray-100 border-b border-gray-100"
+                        >
+                            <Settings size={18} />
+                            <span>Quản lý tài khoản</span>
+                        </button>
+
+                        {/* Lịch sử đơn hàng */}
+                        <button
+                            onClick={() => {
+                                onMenuClose?.();
+                                router.push('/account/orders');
+                            }}
+                            className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition active:bg-gray-100 border-b border-gray-100"
+                        >
+                            <ShoppingBag size={18} />
+                            <span>Lịch sử đơn hàng</span>
+                        </button>
+
+                        {/* Sản phẩm yêu thích */}
+                        <button
+                            onClick={() => {
+                                onMenuClose?.();
+                                router.push('/account/wishlist');
+                            }}
+                            className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition active:bg-gray-100"
+                        >
+                            <Heart size={18} />
+                            <span>Sản phẩm yêu thích</span>
+                        </button>
                     </div>
 
                     {/* Logout Button */}

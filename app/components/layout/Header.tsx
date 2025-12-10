@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Menu, X, ShoppingCart } from 'lucide-react';
 import Profile from './Profile';
 import { usePathname } from 'next/navigation';
+// import { link } from "fs"; // 💡 Đã xóa import không dùng tới
 
 function Header() {
     type LangKey = "vi" | "en";
@@ -17,12 +18,12 @@ function Header() {
     const [isLangOpen, setIsLangOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [isServicesOpen, setIsServicesOpen] = useState(false);
-    const [isProductOpen, setIsProductOpen] = useState(false); // 💡 State MỚI cho Product Dropdown
+    const [isProductOpen, setIsProductOpen] = useState(false);
 
     const servicesRef = useRef<HTMLDivElement | null>(null);
     const servicesButtonRef = useRef<HTMLButtonElement | null>(null);
-    const productsRef = useRef<HTMLDivElement | null>(null); // 💡 Ref MỚI cho Product Dropdown
-    const productsButtonRef = useRef<HTMLButtonElement | null>(null); // 💡 Ref MỚI cho nút Product
+    const productsRef = useRef<HTMLDivElement | null>(null);
+    const productsButtonRef = useRef<HTMLButtonElement | null>(null);
     const langMenuRef = useRef<HTMLDivElement | null>(null);
     const langToggleRef = useRef<HTMLButtonElement | null>(null);
     const closeTimeoutRef = useRef<number | null>(null);
@@ -38,7 +39,6 @@ function Header() {
         setOpen(false);
     };
 
-    // 💡 CẬP NHẬT: Thêm mảng products
     const texts: Record<LangKey, {
         home: string;
         about: string;
@@ -48,7 +48,7 @@ function Header() {
         logo: string;
         service: string;
         services: Array<{ href: string; icon: string; vi: string; en: string }>;
-        products: Array<{ href: string; icon: string; vi: string; en: string }>; // 💡 MỤC PRODUCT MỚI
+        products: Array<{ href: string; icon: string; vi: string; en: string }>;
         login: string;
         logout: string;
         callUs: string;
@@ -81,10 +81,9 @@ function Header() {
             langFull: "Tiếng Việt",
             flag: "🇻🇳",
             services: [
-                { href: "/servicess/design-web", icon: "", vi: "Thiết kế web", en: "Web design" },
-                // { href: "/servicess/design-portfolio", icon: "", vi: "Thiết kế portfolio", en: "Portfolio design" },
+                { href: "/servicess/design-web", icon: "", vi: "Thiết Kế Website", en: "Web design" },
+                { href: "/servicess/design-portfolio", icon: "", vi: "Lập Trình Phần Mềm", en: "Portfolio design" },
             ],
-            // 💡 DỮ LIỆU PRODUCT
             products: [
                 { href: "/product/phan-cung", icon: "", vi: "Phần cứng & Thiết bị", en: "Hardware & Devices" },
                 { href: "/product/san-pham-so", icon: "", vi: "Sản phẩm số", en: "Digital Products" },
@@ -110,17 +109,16 @@ function Header() {
             langFull: "English",
             flag: "🇺🇸",
             services: [
-                { href: "/servicess/design-web", icon: "🌐", vi: "Thiết kế web", en: "Web design" },
-                { href: "/servicess/portfolio", icon: "💸", vi: "Thiết kế portfolio", en: "Portfolio design" },
+                { href: "/servicess/design-web", icon: "", vi: "Thiết kế web", en: "Web design" },
+                { href: "/servicess/portfolio", icon: "", vi: "Thiết kế portfolio", en: "Portfolio design" },
             ],
-            // 💡 DỮ LIỆU PRODUCT
             products: [
-                { href: "/product/phan-cung", icon: "💻", vi: "Phần cứng & Thiết bị", en: "Hardware & Devices" },
-                { href: "/product/san-pham-so", icon: "📱", vi: "Sản phẩm số", en: "Digital Products" },
+                { href: "/product/phan-cung", icon: "", vi: "Phần cứng & Thiết bị", en: "Hardware & Devices" },
+                { href: "/product/san-pham-so", icon: "", vi: "Sản phẩm số", en: "Digital Products" },
             ]
         }
     }
-
+    // 💡 Xóa interface HeaderProps không cần thiết vì không dùng props currentPage
 
     // Giữ nguyên useEffect khóa cuộn trang
     useEffect(() => {
@@ -134,23 +132,20 @@ function Header() {
         };
     }, [open]);
 
-    // Đóng dropdown khi click ra ngoài (dành cho desktop)
+    // Giữ nguyên useEffect đóng dropdown khi click ra ngoài
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             const target = event.target as Node | null;
-            // Close language menu if click outside
             if (isLangOpen) {
                 if (langMenuRef.current && !langMenuRef.current.contains(target) && langToggleRef.current && !langToggleRef.current.contains(target)) {
                     setIsLangOpen(false);
                 }
             }
-            // Close services menu if click outside
             if (isServicesOpen) {
                 if (servicesRef.current && !servicesRef.current.contains(target) && servicesButtonRef.current && !servicesButtonRef.current.contains(target)) {
                     setIsServicesOpen(false);
                 }
             }
-            // 💡 Close products menu if click outside
             if (isProductOpen) {
                 if (productsRef.current && !productsRef.current.contains(target) && productsButtonRef.current && !productsButtonRef.current.contains(target)) {
                     setIsProductOpen(false);
@@ -158,12 +153,20 @@ function Header() {
             }
         };
         document.addEventListener("mousedown", handleClickOutside);
-        // 💡 Thêm isProductOpen vào dependency array
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isLangOpen, isServicesOpen, isProductOpen]);
 
-    const commonLinkClass = "relative block py-3 px-1 transition duration-200 after:absolute after:bottom-0 after:left-1/2 after:w-0 after:h-0.5 after:bg-blue-600 after:transition-all after:duration-300 after:hover:w-full after:hover:left-0";
-    const serviceLinkClass = "flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 text-gray-700 hover:text-blue-700 transition duration-200";
+    // 💡 CẬP NHẬT: commonLinkClass để áp dụng màu và gạch dưới cho active state
+    const commonLinkClass = (isActive: boolean) => {
+        return `
+            relative block py-3 px-1 transition duration-200
+            ${isActive
+                ? 'text-orange-600 after:w-full after:left-0'
+                : 'text-gray-600 hover:text-orange-600 after:w-0 after:hover:w-full after:left-0'
+            }
+            after:absolute after:bottom-0 after:left-0 after:h-0.5 after:bg-orange-600 after:transition-all after:duration-300
+        `;
+    };
 
     // Ngôn ngữ thay thế (langAlt)
     const langAlt = lang === "vi" ? "en" : "vi";
@@ -172,15 +175,18 @@ function Header() {
 
     const pathname = usePathname();
 
+    // Giữ nguyên hàm kiểm tra đường dẫn
     function isActivePath(href: string) {
         try {
             const norm = (p: string | null | undefined) => {
                 const s = (p || '').replaceAll('\\', '/');
+                // Xóa dấu '/' thừa ở cuối, trừ trường hợp nó là '/'
                 return s.replace(/\/+$/, '') || '/';
             };
             const p = norm(pathname);
             const h = norm(href);
-            return p === h || p.startsWith(h + '/');
+            // Kiểm tra khớp hoàn toàn HOẶC đường dẫn hiện tại bắt đầu bằng liên kết (cho các đường dẫn con)
+            return p === h || (h !== '/' && p.startsWith(h + '/'));
         } catch {
             return false;
         }
@@ -227,8 +233,13 @@ function Header() {
 
                     {/* NAV DESKTOP */}
                     <nav className="hidden lg:flex flex-1 justify-center">
-                        <ul className="flex gap-8 text-base font-semibold text-gray-600">
-                            <li><Link href="/home" className={commonLinkClass}>{currentLangText.home}</Link></li>
+                        <ul className="flex gap-8 text-base font-semibold">
+                            {/* 💡 CẬP NHẬT: ÁP DỤNG commonLinkClass */}
+                            <li>
+                                <Link href="/" className={commonLinkClass(isActivePath('/'))}>
+                                    {currentLangText.home}
+                                </Link>
+                            </li>
 
                             {/* SERVICES DROPDOWN DESKTOP */}
                             <li
@@ -248,27 +259,27 @@ function Header() {
                                     }, 180);
                                 }}
                             >
-                                <div className="flex items-center gap-1 hover:text-blue-600 transition duration-200 py-3">
+                                {/* 💡 CẬP NHẬT: Áp dụng commonLinkClass cho DIV bọc ngoài để có gạch chân active */}
+                                <div className={`flex items-center gap-1 transition duration-200 ${commonLinkClass(isActivePath('/servicess'))} !py-3`}>
                                     <button
                                         ref={servicesButtonRef}
                                         onClick={() => setIsServicesOpen(s => !s)}
                                         aria-expanded={isServicesOpen}
                                         aria-haspopup="menu"
-                                        className={`flex items-center gap-1 ${isActivePath('/servicess') ? 'text-blue-600' : ''}`}
+                                        className="flex items-center gap-1" // Loại bỏ text-blue-600/hover:text-blue-600 khỏi button, để div xử lý
                                     >
                                         {currentLangText.service}
                                         <ChevronDown size={18} className={`transition-transform duration-300 ${isServicesOpen ? 'rotate-180' : 'rotate-0'}`} />
                                     </button>
                                 </div>
 
-                                {/* Dropdown thẳng hàng với mục chính */}
+                                {/* Dropdown giữ nguyên */}
                                 <div
                                     ref={servicesRef}
                                     className={`${isServicesOpen ? 'block' : 'hidden'} absolute left-1/2 -translate-x-1/2 top-full pt-2 z-20`}
                                     role="menu"
                                 >
                                     <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden min-w-[200px]">
-                                        {/* Mũi tên chỉ lên */}
                                         <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-l border-t border-gray-100 rotate-45"></div>
 
                                         <div className="py-2">
@@ -282,7 +293,7 @@ function Header() {
                                                             flex items-center gap-3 px-5 py-3 text-sm font-medium
                                                             transition-all duration-200
                                                             ${active
-                                                                ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-l-3 border-blue-500'
+                                                                ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-l-[3px] border-blue-500'
                                                                 : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:pl-6'
                                                             }
                                                             ${index !== currentLangText.services.length - 1 ? 'border-b border-gray-50' : ''}
@@ -319,27 +330,27 @@ function Header() {
                                     }, 180);
                                 }}
                             >
-                                <div className="flex items-center gap-1 hover:text-blue-600 transition duration-200 py-3">
+                                {/* 💡 CẬP NHẬT: Áp dụng commonLinkClass cho DIV bọc ngoài để có gạch chân active */}
+                                <div className={`flex items-center gap-1 transition duration-200 ${commonLinkClass(isActivePath('/product'))} !py-3`}>
                                     <button
                                         ref={productsButtonRef}
                                         onClick={() => setIsProductOpen(s => !s)}
                                         aria-expanded={isProductOpen}
                                         aria-haspopup="menu"
-                                        className={`flex items-center gap-1 ${isActivePath('/product') ? 'text-blue-600' : ''}`}
+                                        className="flex items-center gap-1" // Loại bỏ các class active không cần thiết trên button
                                     >
                                         {currentLangText.product}
                                         <ChevronDown size={18} className={`transition-transform duration-300 ${isProductOpen ? 'rotate-180' : 'rotate-0'}`} />
                                     </button>
                                 </div>
 
-                                {/* Dropdown thẳng hàng với mục chính */}
+                                {/* Dropdown giữ nguyên */}
                                 <div
                                     ref={productsRef}
                                     className={`${isProductOpen ? 'block' : 'hidden'} absolute left-1/2 -translate-x-1/2 top-full pt-2 z-20`}
                                     role="menu"
                                 >
                                     <div className="bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden min-w-[220px]">
-                                        {/* Mũi tên chỉ lên */}
                                         <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-white border-l border-t border-gray-100 rotate-45"></div>
 
                                         <div className="py-2">
@@ -353,7 +364,7 @@ function Header() {
                                                             flex items-center gap-3 px-5 py-3 text-sm font-medium
                                                             transition-all duration-200
                                                             ${active
-                                                                ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-l-3 border-blue-500'
+                                                                ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border-l-[3px] border-blue-500'
                                                                 : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:pl-6'
                                                             }
                                                             ${index !== currentLangText.products.length - 1 ? 'border-b border-gray-50' : ''}
@@ -372,71 +383,28 @@ function Header() {
                                 </div>
                             </li>
 
-                            <li><Link href="/news" className={commonLinkClass}>{currentLangText.news}</Link></li>
-                            <li><Link href="/about" className={commonLinkClass}>{currentLangText.about}</Link></li>
-                            <li><Link href="/contact" className={commonLinkClass}>{currentLangText.contact}</Link></li>
+                            {/* 💡 CẬP NHẬT: ÁP DỤNG commonLinkClass */}
+                            <li><Link href="/news" className={commonLinkClass(isActivePath('/news'))}>{currentLangText.news}</Link></li>
+                            <li><Link href="/about" className={commonLinkClass(isActivePath('/about'))}>{currentLangText.about}</Link></li>
+                            <li><Link href="/contact" className={commonLinkClass(isActivePath('/contact'))}>{currentLangText.contact}</Link></li>
                         </ul>
                     </nav>
 
                     {/* 💡 ACTIONS & LANGUAGE SWITCHER DESKTOP */}
                     <div className="hidden lg:flex items-center gap-3">
-
-                        {/* Profile Component - Desktop */}
                         <Profile texts={profileTexts} variant="desktop" />
-                        {/* Giỏ hàng icon */}
                         <button className="relative px-3 py-2 rounded-full hover:bg-gray-100 transition active:scale-95" aria-label="Giỏ hàng">
                             <ShoppingCart size={22} className="text-gray-700" />
-                            {/* Badge số lượng sản phẩm (demo) */}
                             <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-lg">0</span>
                         </button>
-                        {/* Nút dịch */}
-                        {/* <button
-                            ref={langToggleRef}
-                            onClick={() => setIsLangOpen(!isLangOpen)}
-                            className="flex items-center gap-1 px-3 py-2 text-sm font-semibold text-gray-700 rounded-full border border-gray-300 hover:bg-gray-100 transition active:scale-95"
-                        >
-                            <span className="text-xl">{currentLangText.flag}</span>
-                            <span>{currentLangText.langCode}</span>
-                            <ChevronDown size={16} className={`transition-transform duration-200 ${isLangOpen ? 'rotate-180' : 'rotate-0'}`} />
-                        </button> */}
-                        {isLangOpen && (
-                            <div ref={langMenuRef} className="absolute right-0 top-full mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-xl z-30 animate-fade-in-down"
-                                style={{ animationDuration: '0.2s' }}
-                            >
-                                {/* Ngôn ngữ hiện tại */}
-                                <div className="flex items-center gap-3 p-3 text-sm font-bold text-blue-600 bg-blue-50/50 rounded-t-lg">
-                                    <span className="text-xl">{currentLangText.flag}</span>
-                                    {currentLangText.langFull}
-                                </div>
-
-                                {/* Ngôn ngữ thay thế (có thể click) */}
-                                <button
-                                    onClick={() => handleLangToggle(langAlt as LangKey)}
-                                    className="flex items-center gap-3 p-3 w-full text-left text-sm font-medium text-gray-700 hover:bg-gray-100 transition rounded-b-lg"
-                                >
-                                    <span className="text-xl">{alternateLangText.flag}</span>
-                                    {alternateLangText.langFull}
-                                </button>
-                            </div>
-                        )}
                     </div>
 
                     {/* MOBILE MENU BUTTON & LANGUAGE TOGGLE (MOBILE) */}
                     <div className="lg:hidden flex items-center gap-2">
-                        {/* Giỏ hàng icon mobile */}
                         <button className="relative px-2 py-2 rounded-full hover:bg-gray-100 transition active:scale-95" aria-label="Giỏ hàng">
                             <ShoppingCart size={22} className="text-gray-700" />
                             <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 font-bold shadow-lg">0</span>
                         </button>
-                        {/* Nút chuyển ngôn ngữ */}
-                        {/* <button
-                            onClick={() => handleLangToggle(langAlt as LangKey)}
-                            className="text-gray-800 p-2 rounded-lg hover:bg-gray-100 active:scale-95 transition flex items-center gap-1 font-bold text-sm"
-                        >
-                            <Globe size={24} className="text-blue-600" />
-                            {currentLangText.langCode}
-                        </button> */}
-                        {/* Mobile Menu Button */}
                         <button
                             onClick={() => setOpen(!open)}
                             className="text-gray-800 p-2 rounded-lg hover:bg-gray-100 active:scale-95 transition"
@@ -467,24 +435,44 @@ function Header() {
                         </div>
 
                         <ul className="flex flex-col gap-1 mt-4 text-gray-800 text-base font-medium">
-                            <Link href="/home" className="block py-3 hover:text-blue-600 transition" onClick={() => setOpen(false)}>{currentLangText.home}</Link>
-                            <Link href="/news" className="block py-3 hover:text-blue-600 transition" onClick={() => setOpen(false)}>{currentLangText.news}</Link>
-                            <Link href="/about" className="block py-3 hover:text-blue-600 transition" onClick={() => setOpen(false)}>{currentLangText.about}</Link>
-                            <Link href="/contact" className="block py-3 hover:text-blue-600 transition" onClick={() => setOpen(false)}>{currentLangText.contact}</Link>
+                            {/* 💡 CẬP NHẬT: THÊM ACTIVE STATE CHO MOBILE */}
+                            <Link href="/"
+                                className={`block py-3 transition ${isActivePath('/') ? 'text-orange-600 font-bold' : 'hover:text-orange-600'}`}
+                                onClick={() => setOpen(false)}
+                            >
+                                {currentLangText.home}
+                            </Link>
+                            <Link href="/news"
+                                className={`block py-3 transition ${isActivePath('/news') ? 'text-orange-600 font-bold' : 'hover:text-orange-600'}`}
+                                onClick={() => setOpen(false)}
+                            >
+                                {currentLangText.news}
+                            </Link>
+                            <Link href="/about"
+                                className={`block py-3 transition ${isActivePath('/about') ? 'text-orange-600 font-bold' : 'hover:text-orange-600'}`}
+                                onClick={() => setOpen(false)}
+                            >
+                                {currentLangText.about}
+                            </Link>
+                            <Link href="/contact"
+                                className={`block py-3 transition ${isActivePath('/contact') ? 'text-orange-600 font-bold' : 'hover:text-orange-600'}`}
+                                onClick={() => setOpen(false)}
+                            >
+                                {currentLangText.contact}
+                            </Link>
 
-                            {/* SERVICES MOBILE */}
-                            <details className="group border-t border-gray-100 mt-2 pt-2">
-                                <summary className="flex items-center justify-between py-3 cursor-pointer list-none hover:text-blue-600 transition">
+                            {/* SERVICES MOBILE - Giữ nguyên logic active bên trong map */}
+                            <details className="group border-t border-gray-100 mt-2 pt-2" open={isActivePath('/servicess')}> {/* 💡 Mở mặc định nếu đang ở trang con */}
+                                <summary className={`flex items-center justify-between py-3 cursor-pointer list-none transition ${isActivePath('/servicess') ? 'text-orange-600 font-bold' : 'hover:text-orange-600'}`}>
                                     {currentLangText.service}
                                     <ChevronDown size={18} className="transition-transform duration-300 group-open:rotate-180" />
                                 </summary>
-
                                 <div className="flex flex-col gap-2 ml-4 mt-2 pb-2 text-sm">
                                     {currentLangText.services.map((item) => {
                                         const active = isActivePath(item.href);
                                         return (
                                             <Link key={item.href} href={item.href}
-                                                className={`flex items-center gap-3 py-2 px-2 rounded-lg ${active ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-100 hover:text-blue-600'}`}
+                                                className={`flex items-center gap-3 py-2 px-2 rounded-lg ${active ? 'bg-orange-50 text-orange-700' : 'hover:bg-gray-100 hover:text-orange-600'}`}
                                                 onClick={() => setOpen(false)}
                                             >
                                                 <span className="text-lg">{item.icon}</span>
@@ -495,19 +483,18 @@ function Header() {
                                 </div>
                             </details>
 
-                            {/* 💡 PRODUCT MOBILE (MỚI) */}
-                            <details className="group border-t border-gray-100 mt-2 pt-2">
-                                <summary className="flex items-center justify-between py-3 cursor-pointer list-none hover:text-blue-600 transition">
+                            {/* PRODUCT MOBILE (MỚI) - Giữ nguyên logic active bên trong map */}
+                            <details className="group border-t border-gray-100 mt-2 pt-2" open={isActivePath('/product')}> {/* 💡 Mở mặc định nếu đang ở trang con */}
+                                <summary className={`flex items-center justify-between py-3 cursor-pointer list-none transition ${isActivePath('/product') ? 'text-orange-600 font-bold' : 'hover:text-orange-600'}`}>
                                     {currentLangText.product}
                                     <ChevronDown size={18} className="transition-transform duration-300 group-open:rotate-180" />
                                 </summary>
-
                                 <div className="flex flex-col gap-2 ml-4 mt-2 pb-2 text-sm">
                                     {currentLangText.products.map((item) => {
                                         const active = isActivePath(item.href);
                                         return (
                                             <Link key={item.href} href={item.href}
-                                                className={`flex items-center gap-3 py-2 px-2 rounded-lg ${active ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-100 hover:text-blue-600'}`}
+                                                className={`flex items-center gap-3 py-2 px-2 rounded-lg ${active ? 'bg-orange-50 text-orange-700' : 'hover:bg-gray-100 hover:text-orange-600'}`}
                                                 onClick={() => setOpen(false)}
                                             >
                                                 <span className="text-lg">{item.icon}</span>

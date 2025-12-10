@@ -22,7 +22,7 @@ function ContactPage() {
     const normalizePhoneNumber = (phone: string): string => {
         // Loại bỏ tất cả ký tự không phải số và dấu +
         let cleaned = phone.replace(/[^\d+]/g, "");
-        
+
         // Nếu bắt đầu bằng +84, chuyển thành 0
         if (cleaned.startsWith("+84")) {
             cleaned = "0" + cleaned.slice(3);
@@ -31,7 +31,7 @@ function ContactPage() {
         else if (cleaned.startsWith("84") && cleaned.length > 10) {
             cleaned = "0" + cleaned.slice(2);
         }
-        
+
         return cleaned;
     };
 
@@ -46,7 +46,7 @@ function ContactPage() {
     // Xử lý thay đổi input
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        
+
         // Xử lý đặc biệt cho số điện thoại
         if (name === "phone") {
             // Chỉ cho phép nhập số, dấu + và khoảng trắng
@@ -55,7 +55,7 @@ function ContactPage() {
         } else {
             setFormData((prev) => ({ ...prev, [name]: value }));
         }
-        
+
         // Xóa lỗi khi user bắt đầu nhập
         if (errors[name]) {
             setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -152,15 +152,20 @@ function ContactPage() {
         <div className="min-h-screen bg-gray-50">
             <Header />
 
-            {/* Hero Section - Banner liên hệ */}
-            <div className="relative w-full h-[220px] md:h-[280px] flex flex-col items-center justify-center bg-gradient-to-r from-[#c81d4e] via-[#e84545] to-[#f36f21] overflow-hidden">
-                {/* Hiệu ứng nền động */}
-                <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl animate-pulse"></div>
-                    <div className="absolute bottom-10 right-10 w-48 h-48 bg-yellow-300 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-                    <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-pink-300 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '3s' }}></div>
-                </div>
+            {/* Hero Section - Banner liên hệ (Sử dụng ảnh nền) */}
+            <div className="relative w-full h-[220px] md:h-[280px] flex flex-col items-center justify-center overflow-hidden">
 
+                {/* 🖼️ Ảnh nền và Lớp phủ (Background Image & Overlay) */}
+                <div className="absolute inset-0">
+                    {/* Thay 'duong_dan_den_anh_cua_ban.jpg' bằng URL hoặc đường dẫn import của ảnh bạn muốn */}
+                    <img
+                        src="https://i.pinimg.com/736x/a2/4b/f3/a24bf346b214d06cbd3ab4f84f9c2447.jpg" // ⬅️ THAY ĐỔI ĐƯỜNG DẪN NÀY
+                        alt="Background Banner"
+                        className="w-full h-full object-cover"
+                    />
+                    {/* Lớp phủ tối mờ để chữ trắng dễ đọc hơn */}
+                    <div className="absolute inset-0 bg-black opacity-40"></div>
+                </div>
                 <div className="relative z-10 text-center px-4">
                     <p className="text-white/80 text-sm md:text-base font-medium tracking-widest mb-3 uppercase animate-fade-in">
                         ✨ Anbi Company
@@ -208,9 +213,8 @@ function ContactPage() {
                                             value={formData.name}
                                             onChange={handleChange}
                                             placeholder="Tên của bạn"
-                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${
-                                                errors.name ? "border-red-400 bg-red-50" : "border-gray-200"
-                                            }`}
+                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${errors.name ? "border-red-400 bg-red-50" : "border-gray-200"
+                                                }`}
                                         />
                                         {errors.name && (
                                             <p className="mt-1 text-sm text-red-500">{errors.name}</p>
@@ -223,9 +227,8 @@ function ContactPage() {
                                             value={formData.email}
                                             onChange={handleChange}
                                             placeholder="Địa chỉ email"
-                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${
-                                                errors.email ? "border-red-400 bg-red-50" : "border-gray-200"
-                                            }`}
+                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${errors.email ? "border-red-400 bg-red-50" : "border-gray-200"
+                                                }`}
                                         />
                                         {errors.email && (
                                             <p className="mt-1 text-sm text-red-500">{errors.email}</p>
@@ -241,9 +244,8 @@ function ContactPage() {
                                             value={formData.phone}
                                             onChange={handleChange}
                                             placeholder="Số điện thoại"
-                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${
-                                                errors.phone ? "border-red-400 bg-red-50" : "border-gray-200"
-                                            }`}
+                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${errors.phone ? "border-red-400 bg-red-50" : "border-gray-200"
+                                                }`}
                                         />
                                         {errors.phone && (
                                             <p className="mt-1 text-sm text-red-500">{errors.phone}</p>
@@ -256,9 +258,8 @@ function ContactPage() {
                                             value={formData.service}
                                             onChange={handleChange}
                                             placeholder="Bạn cần dịch vụ gì?"
-                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${
-                                                errors.service ? "border-red-400 bg-red-50" : "border-gray-200"
-                                            }`}
+                                            className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors ${errors.service ? "border-red-400 bg-red-50" : "border-gray-200"
+                                                }`}
                                         />
                                         {errors.service && (
                                             <p className="mt-1 text-sm text-red-500">{errors.service}</p>
@@ -273,9 +274,8 @@ function ContactPage() {
                                         onChange={handleChange}
                                         placeholder="Nội dung lời nhắn..."
                                         rows={5}
-                                        className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors resize-none ${
-                                            errors.message ? "border-red-400 bg-red-50" : "border-gray-200"
-                                        }`}
+                                        className={`w-full border rounded-xl px-4 py-4 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent text-gray-700 bg-gray-50 hover:bg-white transition-colors resize-none ${errors.message ? "border-red-400 bg-red-50" : "border-gray-200"
+                                            }`}
                                     />
                                     {errors.message && (
                                         <p className="mt-1 text-sm text-red-500">{errors.message}</p>
@@ -379,7 +379,7 @@ function ContactPage() {
                 {/* Bản đồ công ty */}
                 <div className="mt-12 md:mt-16">
                     <div className="text-center mb-8">
-                        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">📍 Vị trí của chúng tôi</h2>
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Vị trí của chúng tôi</h2>
                         <p className="text-gray-500">Ghé thăm văn phòng Anbi Company</p>
                     </div>
                     <div className="w-full h-[400px] md:h-[450px] rounded-2xl overflow-hidden shadow-xl border border-gray-100 hover:shadow-2xl transition-shadow duration-300">

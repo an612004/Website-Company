@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, Suspense, lazy } from "react";
+import React, { useState, useEffect, Suspense, lazy, useCallback } from "react";
 import {
     Settings,
     LayoutDashboard,
@@ -10,6 +10,7 @@ import {
     ShoppingBasket,
     Mail,
     Receipt,
+    BookUser,
 } from 'lucide-react';
 
 // Import động các page bằng React.lazy - đặt ngoài component để không bị tạo lại mỗi lần render
@@ -19,46 +20,90 @@ const InterfaceManagementPage = lazy(() => import("../../interface management/pa
 const ContactPage = lazy(() => import("../../contact/page"));
 const WebManagementPage = lazy(() => import("../../web management/page"));
 const VoucherPage = lazy(() => import("../../voucher/page"));
+const ContactWebPage = lazy(() => import("../../contactWeb/page"));
+const BlogsPage = lazy(() => import("../../blogs/page"));
+const AboutPage = lazy(() => import("../../about/page"));
 
 export default function Sidebar() {
     // State xác định mục đang chọn
     const [activeSection, setActiveSection] = useState("giao-dien");
     // State đếm số liên hệ mới
     const [newContactCount, setNewContactCount] = useState(0);
-    // State ẩn badge khi đã xem
-    const [hasViewedContacts, setHasViewedContacts] = useState(false);
+    // State đếm số liên hệ web mới
+    const [newContactWebCount, setNewContactWebCount] = useState(0);
+    // State lưu số liên hệ đã xem (để so sánh) - khởi tạo từ localStorage
+    const [viewedContactCount, setViewedContactCount] = useState<number | null>(null);
+    const [viewedContactWebCount, setViewedContactWebCount] = useState<number | null>(null);
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Load từ localStorage khi component mount
+    useEffect(() => {
+        const savedContactViewed = localStorage.getItem('viewedContactCount');
+        const savedContactWebViewed = localStorage.getItem('viewedContactWebCount');
+
+        if (savedContactViewed !== null) {
+            setViewedContactCount(parseInt(savedContactViewed, 10));
+        }
+        if (savedContactWebViewed !== null) {
+            setViewedContactWebCount(parseInt(savedContactWebViewed, 10));
+        }
+        setIsInitialized(true);
+    }, []);
 
     // Fetch số liên hệ mới
-    const fetchNewContactCount = async () => {
-        // Nếu đã xem rồi thì không fetch nữa
-        if (hasViewedContacts) return;
-
+    const fetchNewContactCount = useCallback(async () => {
         try {
             const response = await fetch('/api/contacts?status=new&limit=1');
             const data = await response.json();
-            if (data.success && data.data.counts) {
+            if (data.success && data.data?.counts) {
                 const newCount = data.data.counts.new || 0;
                 setNewContactCount(newCount);
             }
         } catch (error) {
             console.error('Error fetching contact count:', error);
         }
-    };
+    }, []);
 
-    // Fetch khi component mount và mỗi 30 giây (chỉ khi chưa xem)
-    useEffect(() => {
-        if (!hasViewedContacts) {
-            fetchNewContactCount();
-            const interval = setInterval(fetchNewContactCount, 30000); // 30 giây
-            return () => clearInterval(interval);
+    // Fetch số liên hệ web mới
+    const fetchNewContactWebCount = useCallback(async () => {
+        try {
+            const response = await fetch('/api/contact-web?status=new&limit=1');
+            const data = await response.json();
+            if (data.success && data.counts) {
+                const newCount = data.counts.new || 0;
+                setNewContactWebCount(newCount);
+            }
+        } catch (error) {
+            console.error('Error fetching contact web count:', error);
         }
-    }, [hasViewedContacts]);
+    }, []);
 
-    // Khi click vào tab contact, đánh dấu đã xem
+    // Polling liên tục để cập nhật real-time (mỗi 5 giây)
+    useEffect(() => {
+        // Fetch ngay khi mount
+        fetchNewContactCount();
+        fetchNewContactWebCount();
+
+        // Polling mỗi 5 giây để cập nhật real-time
+        const interval = setInterval(() => {
+            fetchNewContactCount();
+            fetchNewContactWebCount();
+        }, 5000); // 5 giây
+
+        return () => clearInterval(interval);
+    }, [fetchNewContactCount, fetchNewContactWebCount]);
+
+    // Khi click vào tab contact, lưu số lượng hiện tại (đánh dấu đã xem) vào localStorage
     const handleMenuClick = (key: string) => {
         setActiveSection(key);
+        // Khi vào trang contact, lưu lại số lượng đã xem vào cả state và localStorage
         if (key === 'contact') {
-            setHasViewedContacts(true);
+            setViewedContactCount(newContactCount);
+            localStorage.setItem('viewedContactCount', newContactCount.toString());
+        }
+        if (key === 'contact-web') {
+            setViewedContactWebCount(newContactWebCount);
+            localStorage.setItem('viewedContactWebCount', newContactWebCount.toString());
         }
     };
 
@@ -109,6 +154,16 @@ export default function Sidebar() {
             icon: Mail,
             label: "Quản lý Liên hệ",
         },
+        {
+            key: "contact-web",
+            icon: Mail,
+            label: "Quản lý Liên hệ Web",
+        },
+        {
+            key: "about",
+            icon: BookUser,
+            label: "Quản lý trang giới thiệu",
+        },
     ];
 
     const renderSectionContent = () => {
@@ -144,11 +199,27 @@ export default function Sidebar() {
                     </Suspense>
                 );
             case "tin-tuc":
-                return <div className="p-4">Nội dung Tin tức ở đây.</div>;
+                return (
+                    <Suspense fallback={<div>Đang tải...</div>}>
+                        <BlogsPage />
+                    </Suspense>
+                );
             case "contact":
                 return (
                     <Suspense fallback={<div>Đang tải...</div>}>
                         <ContactPage />
+                    </Suspense>
+                );
+            case "contact-web":
+                return (
+                    <Suspense fallback={<div>Đang tải...</div>}>
+                        <ContactWebPage />
+                    </Suspense>
+                );
+            case "about":
+                return (
+                    <Suspense fallback={<div>Đang tải...</div>}>
+                        <AboutPage />
                     </Suspense>
                 );
             case "cai-dat":
@@ -177,8 +248,27 @@ export default function Sidebar() {
                         `;
                         const IconComponent = item.icon;
                         const iconClasses = `w-5 h-5 ${isActive ? "text-white" : "text-blue-400"}`;
-                        // Chỉ hiện badge nếu có liên hệ mới VÀ chưa xem (không đang ở tab contact)
-                        const showBadge = item.key === "contact" && newContactCount > 0 && !hasViewedContacts && activeSection !== "contact";
+
+                        // Tính số liên hệ MỚI (chưa xem)
+                        // Chỉ hiện badge khi đã khởi tạo xong và có nhiều hơn số đã xem
+                        let badgeCount = 0;
+                        if (isInitialized) {
+                            if (item.key === "contact") {
+                                // Nếu chưa bao giờ xem (null) thì hiện tất cả, nếu đã xem thì chỉ hiện số mới thêm
+                                if (viewedContactCount === null) {
+                                    badgeCount = newContactCount;
+                                } else if (newContactCount > viewedContactCount) {
+                                    badgeCount = newContactCount - viewedContactCount;
+                                }
+                            } else if (item.key === "contact-web") {
+                                if (viewedContactWebCount === null) {
+                                    badgeCount = newContactWebCount;
+                                } else if (newContactWebCount > viewedContactWebCount) {
+                                    badgeCount = newContactWebCount - viewedContactWebCount;
+                                }
+                            }
+                        }
+                        const shouldShowBadge = badgeCount > 0 && activeSection !== item.key;
 
                         return (
                             <button
@@ -188,16 +278,16 @@ export default function Sidebar() {
                             >
                                 <div className="relative">
                                     <IconComponent className={iconClasses} />
-                                    {showBadge && (
+                                    {shouldShowBadge && (
                                         <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse">
-                                            {newContactCount > 99 ? '99+' : newContactCount}
+                                            {badgeCount > 99 ? '99+' : badgeCount}
                                         </span>
                                     )}
                                 </div>
                                 <span className="font-medium text-sm flex-1">{item.label}</span>
-                                {showBadge && (
+                                {shouldShowBadge && (
                                     <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
-                                        {newContactCount > 99 ? '99+' : newContactCount}
+                                        {badgeCount > 99 ? '99+' : badgeCount}
                                     </span>
                                 )}
                             </button>

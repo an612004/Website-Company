@@ -99,8 +99,8 @@ const ThemeCard: React.FC<ThemeProps> = ({ theme, index }) => {
                             <button
                                 onClick={(e) => { e.stopPropagation(); setIsLiked(!isLiked); }}
                                 className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-300 backdrop-blur-md ${isLiked
-                                        ? 'bg-red-500 text-white shadow-lg shadow-red-500/50 scale-110'
-                                        : 'bg-white/80 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/50'
+                                    ? 'bg-red-500 text-white shadow-lg shadow-red-500/50 scale-110'
+                                    : 'bg-white/80 text-gray-600 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/50'
                                     }`}
                             >
                                 <Heart className={`w-4 h-4 transition-transform ${isLiked ? 'fill-current scale-110' : 'group-hover:scale-110'}`} />
@@ -186,7 +186,7 @@ function SideWebsite() {
 
     const tabs = [
         { key: 'new', label: 'Website mới', shortLabel: 'Mới', icon: <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />, color: 'from-violet-600 to-purple-600', shadow: 'shadow-violet-500/30' },
-        { key: 'free', label: 'Miễn phí', shortLabel: 'Free', icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" />, color: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/30' },
+        { key: 'Device hardware', label: 'Thiết bị phần cứng', shortLabel: 'Device hardware', icon: <Zap className="w-4 h-4 sm:w-5 sm:h-5" />, color: 'from-emerald-500 to-teal-500', shadow: 'shadow-emerald-500/30' },
         { key: 'under_1m', label: 'Dưới 1 triệu', shortLabel: '<1tr', icon: <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />, color: 'from-amber-500 to-orange-500', shadow: 'shadow-amber-500/30' },
         { key: 'most_bought', label: 'Được mua nhiều', shortLabel: 'Hot', icon: <Package className="w-4 h-4 sm:w-5 sm:h-5" />, color: 'from-blue-600 to-cyan-500', shadow: 'shadow-blue-500/30' },
     ];

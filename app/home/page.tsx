@@ -8,6 +8,9 @@ import LogoTicker from "../components/ui/LogoTicker";
 import StatsCounter from "../components/ui/StatsCounter";
 import TestimonialCarousel from "../components/ui/Testimonials";
 import SideWebsite from "../components/ui/SideWebsite";
+import PriceQuote from "../components/ui/PriceQuote";
+import Webcontact from "../components/ui/Webcontact";
+import Blogs from "../components/ui/Blogs";
 export default function Home() {
 
     return (
@@ -24,6 +27,9 @@ export default function Home() {
                 <Slidebarhandle />
             </div>
             <div>
+                <PriceQuote />
+            </div>
+            <div>
                 <LogoTicker />
             </div>
             <div>
@@ -35,6 +41,12 @@ export default function Home() {
             </div>
             <div>
                 <TestimonialCarousel />
+            </div>
+            <div>
+                <Webcontact />
+            </div>
+            <div>
+                <Blogs />
             </div>
             <Footer />
 

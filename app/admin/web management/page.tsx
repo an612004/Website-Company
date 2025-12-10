@@ -13,7 +13,8 @@ import {
     ImageIcon,
     Search,
     Loader2,
-    ExternalLink
+    ExternalLink,
+    Upload
 } from 'lucide-react';
 
 // Interfaces riêng cho quản lý website
@@ -83,6 +84,10 @@ function WebManagementPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterCategory, setFilterCategory] = useState('');
     const [filterType, setFilterType] = useState('');
+
+    // State cho upload ảnh
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const imageInputRef = useRef<HTMLInputElement>(null);
 
     // Ref cho textarea để paste ảnh
     const descriptionRef = useRef<HTMLDivElement>(null);
@@ -351,6 +356,44 @@ function WebManagementPage() {
             }
         }
     };
+
+    // Xử lý upload ảnh từ máy tính
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingImage(true);
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/upload-banner', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await res.json();
+
+            if (data.url) {
+                setProductForm(prev => ({ ...prev, image: data.url }));
+            } else {
+                alert('Upload thất bại: ' + (data.error || 'Không rõ lý do'));
+            }
+        } catch (err) {
+            console.error('Lỗi upload ảnh:', err);
+            alert('Lỗi upload ảnh');
+        } finally {
+            setUploadingImage(false);
+            // Reset input để có thể chọn lại cùng file
+            if (imageInputRef.current) {
+                imageInputRef.current.value = '';
+            }
+        }
+    };
+
+    // Lọc loại theo danh mục đã chọn trong form
+    const filteredTypesForForm = productForm.category
+        ? types.filter(t => t.category?._id === productForm.category)
+        : types;
 
     // Lọc sản phẩm
     const filteredProducts = products.filter(p => {
@@ -781,19 +824,59 @@ function WebManagementPage() {
                             {/* URL ảnh */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    URL ảnh hiển thị
+                                    Ảnh hiển thị
                                 </label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={productForm.image}
-                                        onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
-                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                        placeholder="https://example.com/image.jpg"
-                                    />
-                                    {productForm.image && (
-                                        <img src={productForm.image} alt="Preview" className="w-12 h-12 object-cover rounded border" />
-                                    )}
+                                <div className="space-y-3">
+                                    {/* Nút chọn ảnh từ máy */}
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            ref={imageInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            className="hidden"
+                                            id="image-upload"
+                                        />
+                                        <label
+                                            htmlFor="image-upload"
+                                            className={`flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-red-500 hover:bg-red-50 transition ${uploadingImage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        >
+                                            {uploadingImage ? (
+                                                <>
+                                                    <Loader2 size={20} className="animate-spin text-red-500" />
+                                                    <span className="text-sm text-gray-600">Đang upload...</span>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload size={20} className="text-gray-500" />
+                                                    <span className="text-sm text-gray-600">Chọn ảnh từ máy</span>
+                                                </>
+                                            )}
+                                        </label>
+                                        <span className="text-gray-400 text-sm">hoặc</span>
+                                    </div>
+
+                                    {/* Input URL ảnh */}
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            value={productForm.image}
+                                            onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                            placeholder="Nhập URL ảnh trực tiếp..."
+                                        />
+                                        {productForm.image && (
+                                            <div className="relative">
+                                                <img src={productForm.image} alt="Preview" className="w-14 h-14 object-cover rounded-lg border" />
+                                                <button
+                                                    onClick={() => setProductForm({ ...productForm, image: '' })}
+                                                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                                                >
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -865,7 +948,15 @@ function WebManagementPage() {
                                     </label>
                                     <select
                                         value={productForm.category}
-                                        onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                                        onChange={(e) => {
+                                            const newCategory = e.target.value;
+                                            // Khi đổi danh mục, reset loại về rỗng
+                                            setProductForm({
+                                                ...productForm,
+                                                category: newCategory,
+                                                type: '' // Reset loại khi đổi danh mục
+                                            });
+                                        }}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                     >
                                         <option value="">Chọn danh mục</option>
@@ -877,14 +968,25 @@ function WebManagementPage() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Loại <span className="text-red-500">*</span>
+                                        {productForm.category && filteredTypesForForm.length === 0 && (
+                                            <span className="text-orange-500 text-xs ml-2">(Chưa có loại cho danh mục này)</span>
+                                        )}
                                     </label>
                                     <select
                                         value={productForm.type}
                                         onChange={(e) => setProductForm({ ...productForm, type: e.target.value })}
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                        disabled={!productForm.category}
                                     >
-                                        <option value="">Chọn loại</option>
-                                        {types.map(t => (
+                                        <option value="">
+                                            {!productForm.category
+                                                ? '-- Chọn danh mục trước --'
+                                                : filteredTypesForForm.length === 0
+                                                    ? '-- Không có loại nào --'
+                                                    : 'Chọn loại'
+                                            }
+                                        </option>
+                                        {filteredTypesForForm.map(t => (
                                             <option key={t._id} value={t._id}>{t.name}</option>
                                         ))}
                                     </select>
