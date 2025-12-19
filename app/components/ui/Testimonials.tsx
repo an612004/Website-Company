@@ -3,64 +3,138 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 
-// Dữ liệu mẫu cho các bình luận và đánh giá (giữ nguyên)
-const testimonials = [
+// Dữ liệu mẫu cho các bình luận và đánh giá (Đã thêm trường 'jobTitle')
+interface Testimonial {
+    id: number;
+    name: string;
+    username: string;
+    jobTitle: string;
+    avatar: string;
+    comment: string;
+    rating: number;
+}
+
+const testimonials: Testimonial[] = [
     {
         id: 1,
-        name: 'kyong',
-        username: '@kyongshiiii06',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        comment: 'Keploy can record and replay complex, distributed API flows as mocks and stubs. It\'s like having a time machine for your tests—saving you tons of time.',
+        name: 'Huy Anh',
+        username: '@huyanh1999',
+        jobTitle: 'Bán hàng', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/34/5c/6d/345c6d52234bbc72407ea25d49ad945e.jpg',
+        comment: 'Công Ty hỗ trợ rất nhiệt tình và chuyên nghiệp. Mình rất hài lòng với dịch vụ!',
         rating: 5,
     },
     {
         id: 2,
-        name: 'yadon',
-        username: '@Seipann11',
+        name: 'Thế Nam',
+        username: '@Nam11',
+        jobTitle: 'Kinh doanh', // Thêm nghề nghiệp
         avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=2000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        comment: 'Keploy is seriously amazing, a genius tool crushing issues at lightning speed.',
+        comment: 'Website rất dễ sử dụng và giao diện đẹp mắt. Rất ấn tượng với trải nghiệm người dùng!',
         rating: 4,
     },
     {
         id: 3,
-        name: 'TadasG',
-        username: '@JustADude404',
+        name: 'Minh Châu Anh',
+        username: '@ChauAnhne',
+        jobTitle: 'Kinh Doanh', // Thêm nghề nghiệp
         avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1976&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        comment: 'Keploy is a tool which can automatically generate tests based on data from your running app. It simply attaches to your app, reads the data being passed through, and generates tests with real data. Pretty cool, huh?',
+        comment: 'Dịch vụ tốt và đội ngũ hỗ trợ rất tận tâm, Website hiện đại thiết kế đúng mẫu. Mình sẽ tiếp tục sử dụng trong tương lai!',
         rating: 5,
     },
     {
         id: 4,
-        name: 'Jane Doe',
-        username: '@JaneDoeDev',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29329?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        comment: 'This service transformed our workflow. Highly recommend for any serious developer!',
+        name: 'Anh vũ',
+        username: '@LamAnhVu',
+        jobTitle: 'Sinh Viên', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/f5/77/bf/f577bf937d3af725cffd8c6974b1fccd.jpg',
+        comment: 'Tài khoản Key dùng rất ok ,rất hài lòng với trải nghiệm mua sắm tại đây. Sản phẩm chất lượng và giao hàng nhanh chóng.',
         rating: 5,
     },
     {
         id: 5,
-        name: 'John Smith',
-        username: '@JohnS_Tech',
+        name: 'Tùng Nguyễn',
+        username: '@NguyenAnhtung1998',
+        jobTitle: 'Kỹ sư', // Thêm nghề nghiệp
         avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        comment: 'An absolute game-changer for testing. Saves countless hours and improves reliability significantly.',
+        comment: 'Sản phẩm wenbsite Ok lắm , tải nhanh, giao diện thân thiện, rất dễ sử dụng, chi phí không quá măc , mình tham khảo nhiểu chỗ thấy chỗ này rẻ hơn',
         rating: 4,
     },
     {
         id: 6,
-        name: 'Alice Wonder',
-        username: '@AliceW_Codes',
-        avatar: 'https://images.unsplash.com/photo-1633332755192-727a05c4013d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        comment: 'Fantastic product with amazing support. Integrates seamlessly with existing projects. A must-have!',
+        name: 'Tâm Lê',
+        username: '@ThaiTamLe',
+        jobTitle: 'Giảng viên', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/68/78/1a/68781a69af4517d39531fcf33fd9f53e.jpg',
+        comment: 'Thiết kế Pofolio rất đẹp và chuyên nghiệp, tôi rất ấn tượng với cách bố trí nội dung và hình ảnh.',
+        rating: 5,
+    },
+    {
+        id: 7,
+        name: 'Trâm Anh',
+        username: '@anh04',
+        jobTitle: 'Sinh viên', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/db/d0/cf/dbd0cff5dfcdaa2789ce596edcbf114b.jpg',
+        comment: 'Website làm đẹp lắm tải nhanh , seo tốt nữa giá cũng vừa túi tiền , Thanks AD.',
+        rating: 5,
+    },
+    {
+        id: 8,
+        name: 'Long ne',
+        username: '@Nguyenanhlong97',
+        jobTitle: 'Văn phòng', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/33/c9/64/33c9644ad122909901a70e1dd069c411.jpg',
+        comment: 'Web làm ok , hỗ trợ nhiệt tình , tận tâm , web sài 5 tháng chưa có lỗi vặt.',
+        rating: 5,
+    },
+    {
+        id: 9,
+        name: 'chopepe',
+        username: '@Nguyenanhlong97',
+        jobTitle: ' Xây dựng', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/97/44/31/9744315ef0fdc8325bb62b5f848fdba5.jpg',
+        comment: 'Tôi làm về 1 web bán vật tư xây dựng, nhờ có web mà doanh số tăng lên rõ rệt, khách hàng dễ dàng tìm thấy sản phẩm của tôi hơn.',
+        rating: 5,
+    },
+    {
+        id: 10,
+        name: 'Lâm barber shop',
+        username: '@lambarbershop',
+        jobTitle: 'Thợ làm tóc', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/ca/89/cd/ca89cd213421f03ad0a5d8db1f3fd6f5.jpg',
+        comment: 'Vừa làm 1 webite cho cửa hang tóc, khách hàng phản hồi rất tốt về giao diện và tính năng đặt lịch trực tuyến.',
+        rating: 5,
+    },
+    {
+        id: 11,
+        name: 'HUU PHONG',
+        username: '@huuphong1389',
+        jobTitle: 'Kinh doanh', // Thêm nghề nghiệp
+        avatar: 'https://i.pinimg.com/736x/bd/36/19/bd3619853f73d9272739e34de87a0220.jpg',
+        comment: 'Ship nhanh trong ngày đã có hàng rồi, phục vụ rất tốt.',
         rating: 5,
     },
 ];
 
-const App = () => {
-    const [isPaused, setIsPaused] = useState(false);
+const Testimonials: React.FC = () => {
+    const [isPaused, setIsPaused] = useState<boolean>(false);
 
     // Dừng/tiếp tục cuộn khi hover hoặc chạm vào carousel
     const handleMouseEnter = () => setIsPaused(true);
     const handleMouseLeave = () => setIsPaused(false);
+
+    // Hàm hiển thị số sao dựa trên rating
+    const renderStars = (rating: number) => (
+        <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+                <Star
+                    key={i}
+                    size={18}
+                    className={`transition-all duration-300 ${i < rating ? 'text-yellow-400 fill-yellow-400 group-hover:scale-110' : 'text-gray-300 dark:text-gray-500'}`}
+                />
+            ))}
+        </div>
+    );
 
     return (
         <section className="py-12 md:py-20 bg-white dark:bg-gray-900 overflow-hidden font-sans">
@@ -128,19 +202,14 @@ const App = () => {
                                         />
                                         <div className="ml-3 text-left">
                                             <p className="text-base font-semibold text-gray-900 dark:text-white">{testimonial.name}</p>
-                                            <p className="text-sm text-pink-600 dark:text-pink-400 font-medium">{testimonial.username}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">{testimonial.jobTitle}</p> {/* Hiển thị nghề nghiệp */}
+                                            <p className="text-xs text-pink-600 dark:text-pink-400">{testimonial.username}</p> {/* Hiển thị username */}
                                         </div>
                                     </div>
 
                                     {/* Star Rating */}
                                     <div className="flex items-center mb-4">
-                                        {[...Array(5)].map((_, i) => (
-                                            <Star
-                                                key={i}
-                                                size={18}
-                                                className={`transition-all duration-300 ${i < testimonial.rating ? 'text-yellow-400 fill-yellow-400 group-hover:scale-110' : 'text-gray-300 dark:text-gray-500'}`}
-                                            />
-                                        ))}
+                                        {renderStars(testimonial.rating)}
                                         <span className="ml-2 text-sm font-bold text-gray-700 dark:text-gray-300">{testimonial.rating}.0</span>
                                     </div>
 
@@ -160,4 +229,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default Testimonials;

@@ -27,6 +27,8 @@ const AboutPage = lazy(() => import("../../about/page"));
 export default function Sidebar() {
     // State xác định mục đang chọn
     const [activeSection, setActiveSection] = useState("giao-dien");
+    // State thu gọn/mở rộng menu cha
+    const [openMenus, setOpenMenus] = useState<{ [key: string]: boolean }>({ order: false });
     // State đếm số liên hệ mới
     const [newContactCount, setNewContactCount] = useState(0);
     // State đếm số liên hệ web mới
@@ -96,7 +98,6 @@ export default function Sidebar() {
     // Khi click vào tab contact, lưu số lượng hiện tại (đánh dấu đã xem) vào localStorage
     const handleMenuClick = (key: string) => {
         setActiveSection(key);
-        // Khi vào trang contact, lưu lại số lượng đã xem vào cả state và localStorage
         if (key === 'contact') {
             setViewedContactCount(newContactCount);
             localStorage.setItem('viewedContactCount', newContactCount.toString());
@@ -105,6 +106,11 @@ export default function Sidebar() {
             setViewedContactWebCount(newContactWebCount);
             localStorage.setItem('viewedContactWebCount', newContactWebCount.toString());
         }
+    };
+
+    // Xử lý thu gọn/mở rộng menu cha
+    const handleParentMenuToggle = (key: string) => {
+        setOpenMenus((prev) => ({ ...prev, [key]: !prev[key] }));
     };
 
     // Định nghĩa cấu trúc menu
@@ -138,6 +144,11 @@ export default function Sidebar() {
             key: "order",
             icon: Box,
             label: "Quản lý Đơn hàng",
+            children: [
+                { key: "order-service", label: "Đơn hàng dịch vụ" },
+                { key: "order-hardware", label: "Đơn hàng phần cứng" },
+                { key: "order-software", label: "Đơn hàng phần mềm" },
+            ],
         },
         {
             key: "web-management",
@@ -166,6 +177,11 @@ export default function Sidebar() {
         },
     ];
 
+    // Import động các trang đơn hàng
+    const ServiceOrdersPage = lazy(() => import("../../orders/service/page"));
+    const HardwareOrdersPage = lazy(() => import("../../orders/hardware/page"));
+    const SoftwareOrdersPage = lazy(() => import("../../orders/software/page"));
+
     const renderSectionContent = () => {
         switch (activeSection) {
             case "interface-management":
@@ -190,6 +206,24 @@ export default function Sidebar() {
                 return (
                     <Suspense fallback={<div>Đang tải...</div>}>
                         <VoucherPage />
+                    </Suspense>
+                );
+            case "order-service":
+                return (
+                    <Suspense fallback={<div>Đang tải...</div>}>
+                        <ServiceOrdersPage />
+                    </Suspense>
+                );
+            case "order-hardware":
+                return (
+                    <Suspense fallback={<div>Đang tải...</div>}>
+                        <HardwareOrdersPage />
+                    </Suspense>
+                );
+            case "order-software":
+                return (
+                    <Suspense fallback={<div>Đang tải...</div>}>
+                        <SoftwareOrdersPage />
                     </Suspense>
                 );
             case "web-management":
@@ -238,60 +272,97 @@ export default function Sidebar() {
                 </div>
                 <nav className="flex flex-col gap-1">
                     {menuItems.map((item) => {
-                        const isActive = activeSection === item.key;
-                        const linkClasses = `
-                            flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 relative
-                            ${isActive
-                                ? "bg-blue-600 text-white shadow-md"
-                                : "text-gray-300 hover:bg-gray-700 hover:text-white"
-                            }
-                        `;
-                        const IconComponent = item.icon;
-                        const iconClasses = `w-5 h-5 ${isActive ? "text-white" : "text-blue-400"}`;
-
-                        // Tính số liên hệ MỚI (chưa xem)
-                        // Chỉ hiện badge khi đã khởi tạo xong và có nhiều hơn số đã xem
-                        let badgeCount = 0;
-                        if (isInitialized) {
-                            if (item.key === "contact") {
-                                // Nếu chưa bao giờ xem (null) thì hiện tất cả, nếu đã xem thì chỉ hiện số mới thêm
-                                if (viewedContactCount === null) {
-                                    badgeCount = newContactCount;
-                                } else if (newContactCount > viewedContactCount) {
-                                    badgeCount = newContactCount - viewedContactCount;
+                        if (!item.children) {
+                            // Mục không có menu con
+                            const isActive = activeSection === item.key;
+                            const linkClasses = `
+                                flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 relative
+                                ${isActive
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
                                 }
-                            } else if (item.key === "contact-web") {
-                                if (viewedContactWebCount === null) {
-                                    badgeCount = newContactWebCount;
-                                } else if (newContactWebCount > viewedContactWebCount) {
-                                    badgeCount = newContactWebCount - viewedContactWebCount;
+                            `;
+                            const IconComponent = item.icon;
+                            const iconClasses = `w-5 h-5 ${isActive ? "text-white" : "text-blue-400"}`;
+                            // ...badge logic giữ nguyên...
+                            let badgeCount = 0;
+                            if (isInitialized) {
+                                if (item.key === "contact") {
+                                    if (viewedContactCount === null) {
+                                        badgeCount = newContactCount;
+                                    } else if (newContactCount > viewedContactCount) {
+                                        badgeCount = newContactCount - viewedContactCount;
+                                    }
+                                } else if (item.key === "contact-web") {
+                                    if (viewedContactWebCount === null) {
+                                        badgeCount = newContactWebCount;
+                                    } else if (newContactWebCount > viewedContactWebCount) {
+                                        badgeCount = newContactWebCount - viewedContactWebCount;
+                                    }
                                 }
                             }
-                        }
-                        const shouldShowBadge = badgeCount > 0 && activeSection !== item.key;
-
-                        return (
-                            <button
-                                key={item.key}
-                                className={linkClasses}
-                                onClick={() => handleMenuClick(item.key)}
-                            >
-                                <div className="relative">
-                                    <IconComponent className={iconClasses} />
+                            const shouldShowBadge = badgeCount > 0 && activeSection !== item.key;
+                            return (
+                                <button
+                                    key={item.key}
+                                    className={linkClasses}
+                                    onClick={() => handleMenuClick(item.key)}
+                                >
+                                    <div className="relative">
+                                        <IconComponent className={iconClasses} />
+                                        {shouldShowBadge && (
+                                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse">
+                                                {badgeCount > 99 ? '99+' : badgeCount}
+                                            </span>
+                                        )}
+                                    </div>
+                                    <span className="font-medium text-sm flex-1">{item.label}</span>
                                     {shouldShowBadge && (
-                                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 animate-pulse">
+                                        <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
                                             {badgeCount > 99 ? '99+' : badgeCount}
                                         </span>
                                     )}
+                                </button>
+                            );
+                        } else {
+                            // Mục có menu con (ví dụ: Đơn hàng)
+                            const isParentActive = item.children.some(child => activeSection === child.key);
+                            const isOpen = openMenus[item.key] || isParentActive;
+                            const linkClasses = `
+                                flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 relative cursor-pointer
+                                ${isParentActive
+                                    ? "bg-blue-600 text-white shadow-md"
+                                    : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                                }
+                            `;
+                            const IconComponent = item.icon;
+                            const iconClasses = `w-5 h-5 ${isParentActive ? "text-white" : "text-blue-400"}`;
+                            return (
+                                <div key={item.key}>
+                                    <div className={linkClasses} onClick={() => handleParentMenuToggle(item.key)}>
+                                        <IconComponent className={iconClasses} />
+                                        <span className="font-medium text-sm flex-1">{item.label}</span>
+                                        <svg className={`w-4 h-4 ml-1 transition-transform duration-200 ${isOpen ? "rotate-90" : "rotate-0"}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                                    </div>
+                                    {isOpen && (
+                                        <div className="ml-7 flex flex-col gap-1 mt-1">
+                                            {item.children.map(child => {
+                                                const isActive = activeSection === child.key;
+                                                return (
+                                                    <button
+                                                        key={child.key}
+                                                        className={`px-3 py-2 rounded-lg text-left transition-colors duration-200 text-sm ${isActive ? "bg-blue-100 text-blue-800 font-bold" : "text-gray-500 hover:bg-gray-200 hover:text-blue-700"}`}
+                                                        onClick={() => handleMenuClick(child.key)}
+                                                    >
+                                                        {child.label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
-                                <span className="font-medium text-sm flex-1">{item.label}</span>
-                                {shouldShowBadge && (
-                                    <span className="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5">
-                                        {badgeCount > 99 ? '99+' : badgeCount}
-                                    </span>
-                                )}
-                            </button>
-                        );
+                            );
+                        }
                     })}
                 </nav>
                 {/* Cài đặt */}

@@ -99,7 +99,7 @@ export default function StatsCounter() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* 💡 Tiêu đề lớn, hiện đại và thu hút */}
                 <h2 className="text-center text-4xl md:text-6xl font-extrabold text-gray-900 mb-4">
-                    Thành Tựu <span className="text-blue-600">Nổi Bật</span>
+                    Thành Tựu <span className="text-orange-400">Nổi Bật</span>
                 </h2>
                 <p className="text-center text-lg md:text-xl text-gray-500 max-w-3xl mx-auto mb-16">
                     Hơn 8 năm hoạt động, chúng tôi đã xây dựng lòng tin và đạt được những cột mốc ấn tượng

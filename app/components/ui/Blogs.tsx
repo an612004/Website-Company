@@ -120,7 +120,7 @@ const Blogs = () => {
                                             priority={blog === blogs[0]} // Ưu tiên tải hình ảnh đầu tiên
                                         />
                                         {/* Tag 'Nổi bật' ở góc trên */}
-                                        <span className="absolute top-3 right-3 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                                        <span className="absolute top-3 right-3 bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
                                             Nổi bật
                                         </span>
                                     </div>

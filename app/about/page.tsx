@@ -2,6 +2,7 @@ import Header from "../components/layout/Header";
 import React from "react";
 import Footer from "../components/layout/Footer";
 import OurTeam from "../components/ui/about/OurTeam";
+import FAQs from "../components/ui/about/FAQs";
 import Image from 'next/image';
 // ... các ảnh khác
 
@@ -87,7 +88,7 @@ function About() {
                 </div>
             </main>
             <OurTeam />
-
+            <FAQs />
             <Footer />
         </div>
     );

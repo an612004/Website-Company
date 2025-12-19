@@ -2,7 +2,7 @@
 import Header from "@/app/components/layout/Header";
 import { useState, useRef, TouchEvent, MouseEvent, useEffect } from "react";
 import { Search, Grid3X3, Tag, ChevronDown, ChevronLeft, ChevronRight, Images, Layers } from "lucide-react";
-
+import BuyWebForm from "@/app/components/ui/design-web/BuyWebForm";
 // Interface cho WebCategory từ API
 interface WebCategory {
     _id: string;
@@ -27,6 +27,21 @@ interface SliderImage {
     order?: number;
 }
 
+// Interface cho WebProduct từ API
+interface WebProduct {
+    _id: string;
+    name: string;
+    description?: string;
+    image?: string;
+    originalPrice?: number;
+    sellingPrice?: number;
+    isDiscount?: boolean;
+    category: WebCategory | string;
+    type: WebType | string;
+    link?: string;
+    createdAt?: string;
+}
+
 function DesignWebPage() {
     const [activeFilter, setActiveFilter] = useState("all");
     const [searchTerm, setSearchTerm] = useState("");
@@ -41,7 +56,16 @@ function DesignWebPage() {
     // State cho categories và types từ API
     const [categories, setCategories] = useState<WebCategory[]>([]);
     const [types, setTypes] = useState<WebType[]>([]);
+    // State cho products (giao diện web) từ API
+    const [products, setProducts] = useState<WebProduct[]>([]);
+    const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+    // State cho modal hiển thị chi tiết sản phẩm
+    const [detailOpen, setDetailOpen] = useState<boolean>(false);
+    const [selectedProduct, setSelectedProduct] = useState<WebProduct | null>(null);
+    // State để hiển thị form mua ngay
+    const [showBuyForm, setShowBuyForm] = useState(false);
+    const [buyProduct, setBuyProduct] = useState<WebProduct | null>(null);
 
     // Fetch categories và types từ API
     useEffect(() => {
@@ -95,6 +119,48 @@ function DesignWebPage() {
         };
         fetchSliders();
     }, []);
+
+    // Fetch products từ API (giao diện web quản trị thêm)
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const res = await fetch('/api/admin/web-product');
+                const data = await res.json();
+                if (data.products) {
+                    setProducts(data.products);
+                }
+            } catch (err) {
+                console.error('Lỗi lấy danh sách sản phẩm web:', err);
+            } finally {
+                setLoadingProducts(false);
+            }
+        };
+        fetchProducts();
+    }, []);
+
+    // Helper: loại bỏ thẻ HTML để hiển thị preview text ngắn gọn
+    const stripHtml = (html?: string) => {
+        if (!html) return '';
+        try {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        } catch (err) {
+            return html.replace(/<[^>]*>?/gm, '');
+        }
+    };
+
+    // Helper: decode HTML entities (nếu nội dung được lưu escaped như &lt;p&gt;...)
+    const decodeHtmlEntities = (html?: string) => {
+        if (!html) return '';
+        try {
+            const txt = document.createElement('textarea');
+            txt.innerHTML = html;
+            return txt.value;
+        } catch (err) {
+            return html;
+        }
+    };
 
     // State cho swipe/drag
     const [isDragging, setIsDragging] = useState(false);
@@ -399,7 +465,7 @@ function DesignWebPage() {
                                                 key={index}
                                                 onClick={() => goToSlide(index)}
                                                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${currentSlide === index
-                                                    ? 'bg-green-500 w-6'
+                                                    ? 'bg-orange-500 w-6'
                                                     : 'bg-gray-300 hover:bg-gray-400'
                                                     }`}
                                             />
@@ -451,6 +517,11 @@ function DesignWebPage() {
                 .animate-spin-slow {
                     animation: spin-slow 20s linear infinite;
                 }
+
+                /* Description HTML styles for product modal */
+                .description-html img { max-width: 100%; height: auto; display: block; margin: 0.5rem 0; }
+                .description-html p { margin-bottom: 0.75rem; }
+                .description-html iframe { max-width: 100%; }
             `}</style>
 
             {/* Filter Section - Thanh lọc giao diện */}
@@ -577,29 +648,146 @@ function DesignWebPage() {
                         </p>
                     </div>
 
-                    {/* Grid hiển thị templates - để trống chờ dữ liệu */}
+                    {/* Grid hiển thị templates lấy từ API quản trị */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {/* Placeholder cards */}
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                            <div
-                                key={item}
-                                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
-                            >
-                                {/* Placeholder hình ảnh */}
-                                <div className="relative h-48 bg-gray-100 flex items-center justify-center">
-                                    <div className="text-gray-300 text-center">
-                                        <div className="w-16 h-16 mx-auto mb-2 bg-gray-200 rounded-lg"></div>
-                                        <span className="text-sm">Hình ảnh giao diện</span>
+                        {loadingProducts ? (
+                            // Loading placeholders
+                            [1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                                <div
+                                    key={item}
+                                    className="animate-pulse group bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 border border-gray-100"
+                                >
+                                    <div className="relative h-48 bg-gray-100 flex items-center justify-center">
+                                        <div className="text-gray-300 text-center">
+                                            <div className="w-16 h-16 mx-auto mb-2 bg-gray-200 rounded-lg"></div>
+                                            <span className="text-sm">Đang tải...</span>
+                                        </div>
+                                    </div>
+                                    <div className="p-4">
+                                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
+                                        <div className="h-3 bg-gray-100 rounded w-1/2"></div>
                                     </div>
                                 </div>
-                                {/* Placeholder thông tin */}
-                                <div className="p-4">
-                                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
-                                    <div className="h-3 bg-gray-100 rounded w-1/2"></div>
+                            ))
+                        ) : (
+                            // Filter và hiển thị products
+                            (() => {
+                                const term = searchTerm.trim().toLowerCase();
+                                const filtered = products.filter((p) => {
+                                    // Filter theo activeFilter
+                                    if (activeFilter === 'all') return true;
+                                    if (activeFilter === 'sale') return !!p.isDiscount;
+                                    // Kiểm tra category hoặc type
+                                    const catId = typeof p.category === 'object' && p.category ? (p.category as WebCategory)._id : (p.category as string);
+                                    const typeId = typeof p.type === 'object' && p.type ? (p.type as WebType)._id : (p.type as string);
+                                    if (activeFilter === catId || activeFilter === typeId) return true;
+                                    return false;
+                                }).filter((p) => {
+                                    if (!term) return true;
+                                    return p.name.toLowerCase().includes(term) || (p.description || '').toLowerCase().includes(term);
+                                });
+
+                                if (filtered.length === 0) {
+                                    return (
+                                        <div className="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 text-center text-gray-500 py-12">
+                                            Không tìm thấy giao diện phù hợp.
+                                        </div>
+                                    );
+                                }
+
+                                return filtered.map((prod) => (
+                                    <div
+                                        key={prod._id}
+                                        className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 flex flex-col h-full mx-auto max-w-xs min-w-[270px]"
+                                        style={{ minHeight: 420 }}
+                                    >
+                                        <div className="relative h-44 bg-gray-50 flex items-center justify-center overflow-hidden">
+                                            <img
+                                                src={prod.image || '/placeholder-templates.png'}
+                                                alt={prod.name}
+                                                className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                                            />
+                                            {prod.isDiscount && (
+                                                <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded shadow">SALE</span>
+                                            )}
+                                        </div>
+                                        <div className="p-5 flex flex-col flex-1 gap-2">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div>
+                                                    <h3 className="text-lg font-bold text-gray-800 leading-tight mb-1 truncate">{prod.name}</h3>
+                                                    <p className="text-xs text-gray-500">{typeof prod.category === 'object' ? (prod.category as WebCategory).name : ''}</p>
+                                                </div>
+                                                <div className="text-right min-w-[90px]">
+                                                    <div className="text-xs text-gray-400 line-through">{prod.originalPrice ? prod.originalPrice.toLocaleString() + '₫' : ''}</div>
+                                                    <div className="text-xl font-extrabold text-orange-600">{prod.sellingPrice ? prod.sellingPrice.toLocaleString() + '₫' : 'Liên hệ'}</div>
+                                                </div>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mt-1 line-clamp-3 min-h-[48px]">{stripHtml(prod.description)}</p>
+                                            <div className="mt-auto pt-4 flex gap-2 justify-center">
+                                                <a
+                                                    href={prod.link || '#'}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="flex-1 px-4 py-2 bg-white border border-orange-600 text-orange-600 rounded-full font-semibold hover:bg-orange-50 text-center transition-all duration-200"
+                                                    style={{ minWidth: 90 }}
+                                                >
+                                                    Xem thử
+                                                </a>
+                                                <a
+                                                    href={`/servicess/design-web/${prod._id}`}
+                                                    className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-full font-semibold hover:bg-orange-600 text-center transition-all duration-200"
+                                                    style={{ minWidth: 90 }}
+                                                >
+                                                    Chi tiết
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ));
+                            })()
+                        )}
+                    </div>
+                    {/* Product Detail Modal */}
+                    {detailOpen && selectedProduct && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+                            <div className="bg-white rounded-xl w-full max-w-4xl overflow-hidden shadow-2xl max-h-[90vh]">
+                                <div className="grid grid-cols-1 md:grid-cols-2 h-full">
+                                    <div className="md:h-auto h-64 bg-gray-100 flex items-center justify-center">
+                                        <img src={selectedProduct.image || '/placeholder-templates.png'} alt={selectedProduct.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="p-6 overflow-y-auto max-h-[90vh]">
+                                        <h3 className="text-3xl font-extrabold text-gray-900 mb-2">{selectedProduct.name}</h3>
+                                        <p className="text-sm text-gray-500 mb-4">{typeof selectedProduct.category === 'object' ? (selectedProduct.category as WebCategory).name : ''} • {typeof selectedProduct.type === 'object' ? (selectedProduct.type as WebType).name : ''}</p>
+                                        <div className="flex items-baseline gap-4 mb-4">
+                                            <div className="text-4xl font-extrabold text-orange-400">{selectedProduct.sellingPrice ? selectedProduct.sellingPrice.toLocaleString() + '₫' : 'Liên hệ'}</div>
+                                            {selectedProduct.originalPrice && (
+                                                <div className="text-sm text-gray-500 line-through">{selectedProduct.originalPrice.toLocaleString() + '₫'}</div>
+                                            )}
+                                        </div>
+                                        <div className="text-gray-700 mb-6 leading-relaxed description-html" dangerouslySetInnerHTML={{ __html: decodeHtmlEntities(selectedProduct.description || '') }} />
+                                        <div className="flex gap-3">
+                                            <a href={selectedProduct.link || '#'} target="_blank" rel="noreferrer" className="px-6 py-3 bg-green-600 text-white rounded-full font-semibold">Xem demo</a>
+                                            <button onClick={() => { setShowBuyForm(true); setBuyProduct(selectedProduct); }} className="px-6 py-3 bg-orange-500 text-white rounded-full font-semibold">Mua ngay</button>
+                                            <button onClick={() => { setDetailOpen(false); setSelectedProduct(null); setShowBuyForm(false); setBuyProduct(null); }} className="px-4 py-3 bg-gray-100 text-gray-700 rounded-full">Đóng</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    )}
+                    {/* Modal BuyWebForm */}
+                    {showBuyForm && buyProduct && (
+                        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-50 p-4">
+                            <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
+                                <div className="flex justify-end p-2">
+                                    <button onClick={() => { setShowBuyForm(false); setBuyProduct(null); }} className="text-gray-500 hover:text-gray-700 text-2xl font-bold">×</button>
+                                </div>
+                                <div className="p-6">
+                                    <BuyWebForm productName={buyProduct.name} productPrice={buyProduct.sellingPrice} productOriginalPrice={buyProduct.originalPrice} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </>

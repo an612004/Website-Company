@@ -66,7 +66,7 @@ export default function Banner() {
             <div className="relative z-20 w-full flex flex-col items-center justify-center">
                 <div className="mt-8 mb-6 flex flex-col items-center">
                     <div className="bg-white/80 rounded-full px-6 py-2 mb-4 shadow text-base font-medium flex items-center gap-2">
-                        <span role="img" aria-label="rocket">🚀</span>
+                        <span role="img" aria-label="rocket"></span>
                         Xem Thử Các Sản Phẩm.
                         <a href="#" className="text-blue-600 font-semibold underline ml-2">Tại Đây!</a>
                     </div>
@@ -79,7 +79,7 @@ export default function Banner() {
                     </h1>
                     <div className="flex gap-4 mt-4">
                         <button className="px-6 py-3 rounded-full bg-gradient-to-r from-orange-400 to-pink-500 text-white font-bold shadow hover:scale-105 transition-all duration-300">Gọi Ngay !</button>
-                        <button className="px-6 py-3 rounded-full bg-white border border-purple-300 text-purple-700 font-bold shadow hover:bg-purple-50 transition-all duration-300">Book Cloud Demo</button>
+                        <button onClick={() => window.location.href = '/servicess/design-web'} className="px-6 py-3 rounded-full bg-white border border-purple-300 text-purple-700 font-bold shadow hover:bg-purple-50 transition-all duration-300">Xem Thêm Website</button>
                     </div>
                 </div>
             </div>
